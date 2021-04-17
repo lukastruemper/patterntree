@@ -1,0 +1,13 @@
+{
+    "cores": 24,
+    "frequency": 3700,
+    "arithmetic-units": 4,
+    "vectorization": "avx512",
+    "caches": [
+      {
+        "latency": 20.95,
+        "bandwidth": 38000.0,
+        "size": 32
+      }
+  ]
+}

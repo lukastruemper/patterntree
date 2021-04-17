@@ -1,0 +1,17 @@
+{
+    "type": "GPU",
+    "latency": 55.07,
+    "bandwidth": 350000.0,
+    "max-bandwidth": 350000.0,
+    "size": 16000.0,
+    "cache-group": [
+      {
+        "identifier": "1",
+        "template": "./sm_tesla_v100_simple.json"
+      },
+      {
+        "identifier": "2",
+        "template": "./sm_tesla_v100_simple.json"
+      }
+    ]
+  }
