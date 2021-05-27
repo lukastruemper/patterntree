@@ -19,10 +19,10 @@ const std::unordered_map<std::string, std::shared_ptr<PatternTree::Node>>& Patte
 
 double PatternTree::Cluster::bandwidth(const PatternTree::Node& from, const PatternTree::Node& to) const
 {
-    return 100.0;
+    return 4148.0;
 };
 
 double PatternTree::Cluster::latency(const PatternTree::Node& from, const PatternTree::Node& to) const
 {
-    return 10.0;
+    return 1840.0;
 };
