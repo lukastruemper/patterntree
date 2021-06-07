@@ -27,6 +27,8 @@ double cache_bandwidth_;
 std::weak_ptr<Device> device_;
 
 public:
+    friend class Device;
+
     Processor(int cores, int arithmetic_units, double frequency, double cache_size, double cache_latency, double cache_bandwidth);
     
     int cores() const;
@@ -37,8 +39,6 @@ public:
     double cache_bandwidth() const;
 
     const Device& device() const;
-    void set_device(std::weak_ptr<Device> device);
-
 
     static std::shared_ptr<Processor> parse(std::string path);
 

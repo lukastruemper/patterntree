@@ -42,11 +42,6 @@ double PatternTree::Processor::cache_bandwidth() const
     return this->cache_bandwidth_;
 };
 
-void PatternTree::Processor::set_device(std::weak_ptr<PatternTree::Device> device)
-{
-    this->device_ = device;
-};
-
 const PatternTree::Device& PatternTree::Processor::device() const
 {
     return *(this->device_.lock());

@@ -1,14 +1,12 @@
 #include "device.h"
 
 PatternTree::Device::Device(std::string type, double memory_size, double memory_latency, double memory_bandwidth, double memory_max_bandwidth, std::unordered_map<std::string, std::shared_ptr<PatternTree::Processor>> processors)
-{
-    this->type_ = type;
-    this->memory_size_ = memory_size;
-    this->memory_latency_ = memory_latency;
-    this->memory_bandwidth_ = memory_bandwidth;
-    this->memory_max_bandwidth_ = memory_max_bandwidth;
+: identifier_(""), type_(type), memory_size_(memory_size), memory_latency_(memory_latency), memory_bandwidth_(memory_bandwidth), memory_max_bandwidth_(memory_max_bandwidth), processors_(processors)
+{};
 
-    this->processors_ = processors;
+std::string PatternTree::Device::identifier() const
+{
+    return this->identifier_;
 };
 
 std::string PatternTree::Device::type() const
@@ -46,11 +44,6 @@ const PatternTree::Node& PatternTree::Device::node() const
     return *(this->node_.lock());
 }
 
-void PatternTree::Device::set_node(std::weak_ptr<PatternTree::Node> node)
-{
-    this->node_ = node;
-}
-
 std::shared_ptr<PatternTree::Device> PatternTree::Device::parse(std::string path)
 {
     std::ifstream device_file(path);
@@ -84,7 +77,7 @@ std::shared_ptr<PatternTree::Device> PatternTree::Device::parse(std::string path
 
     for (auto const& processor : processors)
     {
-        processor.second->set_device(device);
+        processor.second->device_ = device;
     }
 
     return device;

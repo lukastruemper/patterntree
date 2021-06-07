@@ -18,6 +18,7 @@ namespace PatternTree
 class Node;
 
 class Device {
+std::string identifier_;
 std::string type_;
 double memory_size_;
 double memory_latency_;
@@ -29,8 +30,11 @@ std::weak_ptr<Node> node_;
 std::unordered_map<std::string, std::shared_ptr<Processor>> processors_;
 
 public:
+    friend class Node;
+
     Device(std::string type, double memory_size, double memory_latency, double memory_bandwidth, double memory_max_bandwidth, std::unordered_map<std::string, std::shared_ptr<Processor>> processors);
 
+    std::string identifier() const;
     std::string type() const;
     double memory_size() const;
     double memory_latency() const;
@@ -39,7 +43,6 @@ public:
     const std::unordered_map<std::string, std::shared_ptr<Processor>>& processors() const;
 
     const Node& node() const;
-    void set_node(std::weak_ptr<Node> node);
 
     static std::shared_ptr<Device> parse(std::string);
 };

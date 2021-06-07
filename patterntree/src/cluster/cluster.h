@@ -18,11 +18,20 @@ namespace PatternTree
 {
 class Cluster {
 std::string topology_;
+std::vector<std::string> ordered_ids_;
+std::vector<double> bandwidth_matrix_;
+std::vector<double> latency_matrix_;
 std::unordered_map<std::string, std::shared_ptr<Node>> nodes_;
 std::unordered_map<std::string, std::string> addresses_;
 
 public:
-    Cluster(std::string, std::unordered_map<std::string, std::shared_ptr<Node>>, std::unordered_map<std::string, std::string>);
+    Cluster(std::string topology,
+        std::vector<std::string> ordered_ids,
+        std::vector<double> bandwidth_matrix,
+        std::vector<double> latency_matrix,
+        std::unordered_map<std::string, std::shared_ptr<Node>> nodes,
+        std::unordered_map<std::string, std::string> addresses
+    );
    
     std::string topology() const;
     const std::unordered_map<std::string, std::shared_ptr<Node>>& nodes() const;
@@ -40,10 +49,24 @@ public:
         cwk_path_get_dirname(path.c_str(), &base_path_end);
         std::string base_path = path.substr(0, base_path_end);
 
+        std::vector<double> bandwidth_matrix;
+        for (auto row : cluster_json["connectivity-bandwidth"]) {
+            for (auto value : row) {
+                bandwidth_matrix.push_back(value);
+            }
+        }
+
+        std::vector<double> latency_matrix;
+        for (auto row : cluster_json["connectivity-latency"]) {
+            for (auto value : row) {
+                latency_matrix.push_back(value);
+            }
+        }
+
+        std::vector<std::string> ordered_ids;
         std::unordered_map<std::string, std::string> addresses;
         std::unordered_map<std::string, std::shared_ptr<Node>> nodes;
-        for (auto node_json : cluster_json["nodes"])
-        {
+        for (auto node_json : cluster_json["nodes"]) {
             char template_path[FILENAME_MAX];
             std::string template_path_relative = node_json["template"];
             cwk_path_join(base_path.c_str(), template_path_relative.c_str(), template_path, sizeof(template_path));
@@ -53,12 +76,23 @@ public:
             std::string address = node_json["address"];
             nodes[identifier] = node;
             addresses[identifier] = address;
+
+            ordered_ids.push_back(identifier);
         }
-        
-        std::shared_ptr<Cluster> cluster(new Cluster(cluster_json["topology"], nodes, addresses));
-        for (auto const& entry : nodes)
+
+        std::shared_ptr<Cluster> cluster(new Cluster(
+            cluster_json["topology"],
+            ordered_ids,
+            bandwidth_matrix,
+            latency_matrix,
+            nodes,
+            addresses)
+        );
+
+        for (auto& entry : nodes)
         {
-            entry.second->set_cluster(cluster);
+            entry.second->identifier_ = entry.first;
+            entry.second->cluster_ = cluster;
         }
         return cluster;
     };
