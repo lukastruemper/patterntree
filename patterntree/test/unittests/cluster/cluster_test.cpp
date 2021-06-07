@@ -34,10 +34,69 @@ TEST(TestSuiteCluster, TestNode) {
 
     ASSERT_EQ(node->type(), "numa");
     ASSERT_EQ(node->devices().size(), 3);
-    for (auto const& device : node->devices())
-    {
-        ASSERT_EQ(&(device.second->node()), node.get());
-    }
+
+    auto cpu1 = node->devices().find("CPU1");
+    ASSERT_EQ(&(cpu1->second->node()), node.get());
+    
+    auto gpu1 = node->devices().find("GPU1");
+    ASSERT_EQ(&(gpu1->second->node()), node.get());
+    
+    auto gpu2 = node->devices().find("GPU2");
+    ASSERT_EQ(&(gpu2->second->node()), node.get());
+
+    double bandwidth = node->bandwidth(*(cpu1->second), *(gpu1->second));
+    ASSERT_EQ(bandwidth, 12152);
+
+    bandwidth = node->bandwidth(*(cpu1->second), *(gpu2->second));
+    ASSERT_EQ(bandwidth, 12152);
+
+    bandwidth = node->bandwidth(*(gpu1->second), *(gpu2->second));
+    ASSERT_EQ(bandwidth, 12152);
+
+    bandwidth = node->bandwidth(*(gpu1->second), *(cpu1->second));
+    ASSERT_EQ(bandwidth, 12152);
+
+    bandwidth = node->bandwidth(*(gpu2->second), *(cpu1->second));
+    ASSERT_EQ(bandwidth, 12152);
+
+    bandwidth = node->bandwidth(*(gpu2->second), *(gpu1->second));
+    ASSERT_EQ(bandwidth, 12152);
+
+    bandwidth = node->bandwidth(*(cpu1->second), *(cpu1->second));
+    ASSERT_EQ(bandwidth, 0);
+
+    bandwidth = node->bandwidth(*(gpu1->second), *(gpu1->second));
+    ASSERT_EQ(bandwidth, 0);
+
+    bandwidth = node->bandwidth(*(gpu2->second), *(gpu2->second));
+    ASSERT_EQ(bandwidth, 0);
+
+    double latency = node->latency(*(cpu1->second), *(gpu1->second));
+    ASSERT_EQ(latency, 7210);
+
+    latency = node->latency(*(cpu1->second), *(gpu2->second));
+    ASSERT_EQ(latency, 7210);
+
+    latency = node->latency(*(gpu1->second), *(gpu2->second));
+    ASSERT_EQ(latency, 7210);
+
+    latency = node->latency(*(gpu1->second), *(cpu1->second));
+    ASSERT_EQ(latency, 7210);
+
+    latency = node->latency(*(gpu2->second), *(cpu1->second));
+    ASSERT_EQ(latency, 7210);
+
+    latency = node->latency(*(gpu2->second), *(gpu1->second));
+    ASSERT_EQ(latency, 7210);
+
+    latency = node->latency(*(cpu1->second), *(cpu1->second));
+    ASSERT_EQ(latency, 0);
+
+    latency = node->latency(*(gpu1->second), *(gpu1->second));
+    ASSERT_EQ(latency, 0);
+
+    latency = node->latency(*(gpu2->second), *(gpu2->second));
+    ASSERT_EQ(latency, 0);
 }
 
 TEST(TestSuiteCluster, TestCluster) {
@@ -45,10 +104,36 @@ TEST(TestSuiteCluster, TestCluster) {
 
     ASSERT_EQ(cluster->topology(), "fully");
     ASSERT_EQ(cluster->nodes().size(), 2);
-    for (auto const& node : cluster->nodes())
-    {
-        ASSERT_EQ(&(node.second->cluster()), cluster.get());
-    }
+
+    auto node1 = cluster->nodes().find("Node1");
+    ASSERT_EQ(&(node1->second->cluster()), cluster.get());
+
+    auto node2 = cluster->nodes().find("Node2");
+    ASSERT_EQ(&(node2->second->cluster()), cluster.get());
+
+    double bandwidth = cluster->bandwidth(*(node1->second), *(node2->second));
+    ASSERT_EQ(bandwidth, 4148.0);
+
+    bandwidth = cluster->bandwidth(*(node2->second), *(node1->second));
+    ASSERT_EQ(bandwidth, 4148.0);
+
+    bandwidth = cluster->bandwidth(*(node1->second), *(node1->second));
+    ASSERT_EQ(bandwidth, 0.0);
+
+    bandwidth = cluster->bandwidth(*(node2->second), *(node2->second));
+    ASSERT_EQ(bandwidth, 0.0);
+
+    double latency = cluster->latency(*(node1->second), *(node2->second));
+    ASSERT_EQ(latency, 1840.0);
+
+    latency = cluster->latency(*(node2->second), *(node1->second));
+    ASSERT_EQ(latency, 1840.0);
+
+    latency = cluster->latency(*(node1->second), *(node1->second));
+    ASSERT_EQ(latency, 0.0);
+
+    latency = cluster->latency(*(node2->second), *(node2->second));
+    ASSERT_EQ(latency, 0.0);
 }
 
 TEST(TestSuiteCluster, TestDistance) {

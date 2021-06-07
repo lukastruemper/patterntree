@@ -17,19 +17,30 @@ namespace PatternTree
 
 class Cluster;
 class Node {
+std::string identifier_;
 std::string type_;
+std::vector<std::string> ordered_ids_;
+std::vector<double> bandwidth_matrix_;
+std::vector<double> latency_matrix_;
 std::unordered_map<std::string, std::shared_ptr<Device>> devices_;
 
 std::weak_ptr<Cluster> cluster_;
 
 public:
-    Node(std::string, std::unordered_map<std::string, std::shared_ptr<Device>>);
+    friend class Cluster;
 
-    std::string type() const;
-    const std::unordered_map<std::string, std::shared_ptr<Device>>& devices() const;
+    Node(std::string type,
+        std::vector<std::string> ordered_ids,
+        std::vector<double> bandwidth_matrix,
+        std::vector<double> latency_matrix,
+        std::unordered_map<std::string, 
+        std::shared_ptr<Device>> devices
+    );
 
     const Cluster& cluster() const;
-    void set_cluster(std::weak_ptr<Cluster> cluster);
+    std::string type() const;
+    std::string identifier() const;
+    const std::unordered_map<std::string, std::shared_ptr<Device>>& devices() const;
 
     double bandwidth(const Device& from, const Device& to) const;
     double latency(const Device& from, const Device& to) const;
