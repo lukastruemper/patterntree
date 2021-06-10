@@ -74,8 +74,6 @@ void PatternTree::APT::initialize(std::shared_ptr<PatternTree::Cluster> cluster,
 void PatternTree::APT::initialize(std::shared_ptr<PatternTree::Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency, bool synchronization_efficiency)
 {
 	PatternTree::APT::instance = new PatternTree::APT(cluster, operation_interpolation_frequency, data_interpolation_frequency, synchronization_efficiency);
-	
-	Kokkos::initialize();
 };
 
 void PatternTree::APT::synchronization_efficiency(bool enabled)

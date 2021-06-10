@@ -9,7 +9,7 @@
 
 TEST(TestSuitePatternSplit, TestConstructDefault)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
@@ -30,7 +30,7 @@ TEST(TestSuitePatternSplit, TestConstructDefault)
 
 TEST(TestSuitePatternSplit, TestConstructMultipleViewsDefault)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double*>> dataA(new PatternTree::Data<double*>("field", 1000));
     std::shared_ptr<PatternTree::View<double*>> viewA = PatternTree::View<double*>::full(dataA);

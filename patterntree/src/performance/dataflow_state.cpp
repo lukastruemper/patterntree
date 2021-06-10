@@ -70,7 +70,7 @@ void PatternTree::DataflowState::update(PatternTree::Step& step)
 {
     if (step.index() != this->index_ || !step.complete())
     {
-        std::cout << "Inconsistent state update" << std::endl;
+        //std::cout << "Inconsistent state update" << std::endl;
         return;
     }
 

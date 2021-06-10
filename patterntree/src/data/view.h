@@ -4,8 +4,6 @@
 #include <memory>
 #include <type_traits>
 
-#include <Kokkos_Core.hpp>
-
 #include "data/data.h"
 #include "data/data_concepts.h"
 

@@ -11,7 +11,7 @@
 
 TEST(TestSuiteMapDataflow, TestSimple)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
@@ -28,7 +28,7 @@ TEST(TestSuiteMapDataflow, TestSimple)
 
 TEST(TestSuiteMapDataflow, TestAdditionalView)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double*>> fieldA(new PatternTree::Data<double*>("fieldA", 1000));
     std::shared_ptr<PatternTree::Data<double*>> fieldB(new PatternTree::Data<double*>("fieldB", 1000));
@@ -49,7 +49,7 @@ TEST(TestSuiteMapDataflow, TestAdditionalView)
 
 TEST(TestSuiteMapFLOPS, TestEmpty)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
@@ -63,7 +63,7 @@ TEST(TestSuiteMapFLOPS, TestEmpty)
 
 TEST(TestSuiteMapFLOPS, TestConstant)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
@@ -77,7 +77,7 @@ TEST(TestSuiteMapFLOPS, TestConstant)
 
 TEST(TestSuiteMapFLOPS, TestTriangle)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("field", 100, 2));
     std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
@@ -91,7 +91,7 @@ TEST(TestSuiteMapFLOPS, TestTriangle)
 
 TEST(TestSuiteMapFLOPS, TestTouch)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("field", 100, 2));
     std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
@@ -106,7 +106,7 @@ TEST(TestSuiteMapFLOPS, TestTouch)
 
 TEST(TestSuiteMapFLOPS, TestInterpolate)
 {
-	Kokkos::initialize();
+	
 
 	std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("field", 100, 2));
     std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);

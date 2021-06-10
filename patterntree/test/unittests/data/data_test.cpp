@@ -7,8 +7,6 @@
 
 TEST(TestSuiteData, TestDataOneDim)
 {
-	Kokkos::initialize();
-
     std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("test_data", 10));
     
     ASSERT_TRUE(data->is_symbolic());
@@ -18,8 +16,6 @@ TEST(TestSuiteData, TestDataOneDim)
 
 TEST(TestSuiteData, TestDataTwoDim)
 {
-	Kokkos::initialize();
-
     std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("test_data", 3, 2));
     
     ASSERT_TRUE(data->is_symbolic());

@@ -2,10 +2,10 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <unordered_set>
 #include <algorithm>
 #include <math.h>
-#include <Kokkos_Core.hpp>
 
 #include "data/data_concepts.h"
 
@@ -49,27 +49,15 @@ public:
 template<typename D>
 class Data : public IData {
 
-Kokkos::View<D> value_;
-
 public:
 	friend class APT;
 
 	Data(std::string name, int dim0) requires ONEDIM<D>
-	: IData(name, dim0, 0)
-	{
-		this->value_ = Kokkos::View<D>(name, dim0);
-	}
+	: IData(name, dim0, 0) {}
 
 	Data(std::string name, int dim0, int dim1) requires TWODIM<D>
 	: IData(name, dim0, dim1)
-	{
-		this->value_ = Kokkos::View<D>(name, dim0, dim1);
-	}
-
-	Kokkos::View<D>& value()
-	{
-		return this->value_;
-	};
+	{}
 
 };
 }
