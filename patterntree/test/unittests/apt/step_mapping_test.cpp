@@ -59,8 +59,8 @@ TEST(TestSuiteStepMapping, TestSplit)
 
     PatternTree::Step& step = *(apt->begin());
     PatternTree::IPattern& map = *(step.begin());
-
     auto splits = step.split(map, 4);
+    
     ASSERT_EQ(splits.size(), 5);
 
     for (int i = 0; i < 5; i++) {

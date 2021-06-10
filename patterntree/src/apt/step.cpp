@@ -132,8 +132,12 @@ std::vector<std::reference_wrapper<const PatternTree::PatternSplit>> PatternTree
 
 std::vector<std::reference_wrapper<const PatternTree::PatternSplit>> PatternTree::Step::split(const PatternTree::IPattern& pattern, size_t n)
 {
-    std::vector<size_t> sizes(n, pattern.width() / n);
-    sizes.push_back(pattern.width() % (pattern.width() / n));
+    int split_size = pattern.width() / n;
+    std::vector<size_t> sizes(n, split_size);
+    int res = pattern.width() % split_size;
+    if (res > 0) {
+        sizes.push_back(res);
+    }
 
     return this->split(pattern, sizes);
 };
