@@ -1,6 +1,6 @@
 {
     "cores": 24,
-    "frequency": 3700,
+    "frequency": 2100,
     "arithmetic-units": 4,
     "vectorization": "avx512",
     "caches": [

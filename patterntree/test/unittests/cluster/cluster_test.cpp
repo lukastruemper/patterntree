@@ -8,7 +8,7 @@ TEST(TestSuiteCluster, TestProcessor) {
 
     ASSERT_EQ(processor->cores(), 24);
     ASSERT_EQ(processor->arithmetic_units(), 4);
-    ASSERT_EQ(processor->frequency(), 3700);
+    ASSERT_EQ(processor->frequency(), 2100);
     ASSERT_EQ(processor->cache_size(), 32);
     ASSERT_EQ(processor->cache_latency(), 20.95);
     ASSERT_EQ(processor->cache_bandwidth(), 38000.0);

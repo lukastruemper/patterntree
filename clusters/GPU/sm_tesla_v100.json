@@ -1,6 +1,6 @@
 {
     "cores": 64,
-    "frequency": 1380,
+    "frequency": 1245,
     "arithmetic-units": 1,
     "vectorization": "",
     "caches": [
