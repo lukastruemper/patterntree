@@ -67,7 +67,7 @@ json PatternTree::RooflineModel::report()
          json team;
          team["processor"] = it.first->processor().to_json();
          team["cores"] = it.first->cores();
-         team["costs"] = { it.second.first, it.second.first };
+         team["costs"] = { it.second.first, it.second.second };
 
          teams.push_back(team);
       }
