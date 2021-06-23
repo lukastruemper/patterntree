@@ -12,6 +12,7 @@
 #include <performance/dataflow_state.h>
 #include <performance/roofline_model.h>
 
+
 struct JacobiFunctor : public PatternTree::MapFunctor<double*> {
     JacobiFunctor(size_t N, std::shared_ptr<PatternTree::View<double**>> A, std::shared_ptr<PatternTree::View<double*>> b, std::shared_ptr<PatternTree::View<double*>> x_)
     : N(N), A(A), b(b), x_(x_)
@@ -75,10 +76,10 @@ std::unique_ptr<PatternTree::APT> jacobi(size_t N, size_t K, bool fuse)
         auto x_upper = PatternTree::View<double*>::slice(x->data(),  std::make_pair(N / 2, N));
 
         std::unique_ptr<JacobiFunctor> functor_upper(new JacobiFunctor(N / 2, A_upper, b_upper, x_));    
-        PatternTree::APT::map<double*, JacobiFunctor>(std::move(functor_upper), x_upper);
+        PatternTree::APT::map<double*, JacobiFunctor>("jacobi_upper_1", std::move(functor_upper), x_upper);
 
         std::unique_ptr<JacobiFunctor> functor_lower(new JacobiFunctor(N / 2, A_lower, b_lower, x_));    
-        PatternTree::APT::map<double*, JacobiFunctor>(std::move(functor_lower), x_lower);
+        PatternTree::APT::map<double*, JacobiFunctor>("jacobi_lower_1", std::move(functor_lower), x_lower);
 
         x.swap(x_);
     }
@@ -101,7 +102,7 @@ std::unique_ptr<PatternTree::APT> jacobi(size_t N, size_t K, bool fuse)
         auto x_upper2 = PatternTree::View<double*>::slice(x2->data(), std::make_pair(N / 2, N));
 
         std::unique_ptr<JacobiFunctor> functor_upper(new JacobiFunctor(N / 2, A_upper, b_upper2, x_2));    
-        PatternTree::APT::map<double*, JacobiFunctor>(std::move(functor_upper), x_upper2);
+        PatternTree::APT::map<double*, JacobiFunctor>("jacobi_upper_2", std::move(functor_upper), x_upper2);
 
         if (!fuse)
         {
@@ -110,7 +111,7 @@ std::unique_ptr<PatternTree::APT> jacobi(size_t N, size_t K, bool fuse)
         }
 
         std::unique_ptr<JacobiFunctor> functor_lower(new JacobiFunctor(N / 2, A_lower, b_lower2, x_2));    
-        PatternTree::APT::map<double*, JacobiFunctor>(std::move(functor_lower), x_lower2);
+        PatternTree::APT::map<double*, JacobiFunctor>("jacobi_lower_2", std::move(functor_lower), x_lower2);
 
         x2.swap(x_2);
 
@@ -173,7 +174,7 @@ TEST(TestSuiteJacobi, TestBase)
     PatternTree::RooflineModel model;
     double runtime = apt->evaluate(model);
 
-    double runtime_ratio = runtime / 0.985479;
+    double runtime_ratio = runtime / 0.986;
     ASSERT_TRUE(runtime_ratio < 3 && runtime_ratio > 0.3333);
 }
 
@@ -228,6 +229,6 @@ TEST(TestSuiteJacobi, TestOptimized)
     PatternTree::RooflineModel model;
     double runtime = apt->evaluate(model);
 
-    double runtime_ratio = runtime / 0.534504;
+    double runtime_ratio = runtime / 0.539;
     ASSERT_TRUE(runtime_ratio < 3 && runtime_ratio > 0.3333);
 }

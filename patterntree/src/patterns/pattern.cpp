@@ -1,9 +1,10 @@
 #include "pattern.h"
 
-PatternTree::IPattern::IPattern(PatternTree::Dataflow data_in, PatternTree::Dataflow data_out, int width)
+PatternTree::IPattern::IPattern(std::string identifier, PatternTree::Dataflow data_in, PatternTree::Dataflow data_out, int width)
 : 	flow_in_(data_in),
 	flow_out_(data_out),
 	width_(width),
+	identifier_(identifier),
 	info_()
 {};
 
@@ -16,6 +17,11 @@ PatternTree::Dataflow PatternTree::IPattern::produces() const
 {
 	return this->flow_out_;
 };
+
+std::string PatternTree::IPattern::identifier() const
+{
+	return this->identifier_;
+}
 
 int PatternTree::IPattern::width() const
 {

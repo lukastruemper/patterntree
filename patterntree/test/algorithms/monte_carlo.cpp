@@ -106,12 +106,12 @@ std::unique_ptr<PatternTree::APT> monte_carlo(long draws, long estimates, int sp
         auto split = PatternTree::View<double*>::slice(temp->data(), std::make_pair(i * estimates / splits, (i + 1) * estimates / splits));
 
         std::unique_ptr<MonteCarloFunctor> functor(new MonteCarloFunctor(draws));    
-        PatternTree::APT::map<double*, MonteCarloFunctor>(std::move(functor), split);
+        PatternTree::APT::map<double*, MonteCarloFunctor>("monte_carlo_map", std::move(functor), split);
     }
 
     auto res = PatternTree::APT::source<double*>("res", 1);
     std::unique_ptr<MonteCarloReduceFunctor> functor(new MonteCarloReduceFunctor(temp));    
-    PatternTree::APT::map<double*, MonteCarloReduceFunctor>(std::move(functor), res);
+    PatternTree::APT::map<double*, MonteCarloReduceFunctor>("monte_carlo_reduce", std::move(functor), res);
 
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 
@@ -235,5 +235,5 @@ TEST(TestSuiteMonteCarlo, TestDistributed)
     double runtime = apt->evaluate(model);
 
     double runtime_ratio = runtime / 22.238;
-    EXPECT_TRUE(runtime_ratio < 8 && runtime_ratio > 0.125);
+    ASSERT_TRUE(runtime_ratio < 8 && runtime_ratio > 0.125);
 }

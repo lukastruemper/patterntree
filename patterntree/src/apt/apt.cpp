@@ -4,6 +4,8 @@
 
 #include "optimization/optimizer.h"
 
+using json = nlohmann::json;
+
 PatternTree::APT* PatternTree::APT::instance = 0;
 
 size_t PatternTree::APT::size()
@@ -37,8 +39,6 @@ void PatternTree::APT::optimize(PatternTree::IOptimizer& optimizer)
 			return;
 		}
 	}
-
-	std::cout << "Final costs: " << optimizer.costs() << std::endl;
 };
 
 double PatternTree::APT::evaluate(PatternTree::IPerformanceModel& model)
@@ -48,9 +48,22 @@ double PatternTree::APT::evaluate(PatternTree::IPerformanceModel& model)
 		model.update(*iter);
 	}
 
-	std::cout << "Final runtime: " << model.runtime() << std::endl;
+	return model.costs();
+}
 
-	return model.runtime();
+nlohmann::json PatternTree::APT::to_json()
+{
+	json report = json::object();
+	report["size"] = this->size();
+
+	json steps = json::array();
+	for (auto iter = this->begin(); iter != this->end(); iter++)
+	{
+		steps.push_back(iter->to_json());
+	}
+	report["steps"] = steps;
+
+	return report;
 }
 
 void PatternTree::APT::summary()

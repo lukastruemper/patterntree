@@ -1,5 +1,7 @@
 #include "step.h"
 
+using json = nlohmann::json;
+
 PatternTree::Step::Step(std::vector<std::unique_ptr<PatternTree::IPattern>>& patterns, size_t index)
 : index_(index), assignment_(), reverse_assigment_()
 {
@@ -22,6 +24,43 @@ void PatternTree::Step::add_pattern(std::unique_ptr<IPattern> pattern)
 
     std::unique_ptr<PatternTree::PatternSplit> split(new PatternTree::PatternSplit(p));
     this->splits_.insert({p.get(), std::move(split)});
+}
+
+json PatternTree::Step::to_json()
+{
+    json report = json::object();
+    report["index"] = this->index_;
+    report["width"] = this->patterns_.size();
+    report["complete"] = this->complete();
+
+    json assignment = json::array();
+    if (this->complete()) {
+        for (auto const& pattern : this->patterns_) {
+            json pattern_assignment = json::object();
+            pattern_assignment["pattern"] = pattern->identifier();
+
+            json splits_assignment = json::array();
+            auto splits = this->splits_.equal_range(pattern.get());
+            for (auto& it = splits.first; it != splits.second; ++it) {
+                json split_assignment = json::object();
+
+                split_assignment["split_begin"] = it->second->begin();
+                split_assignment["split_end"] = it->second->end();
+
+                auto team = this->assigned(*(it->second)).value();
+                split_assignment["cores"] = team->cores();
+                split_assignment["processor"] = team->processor().to_json();
+
+                splits_assignment.push_back(split_assignment);
+            }
+
+            pattern_assignment["splits"] = splits_assignment;
+            assignment.push_back(pattern_assignment);
+        }
+    }
+
+    report["assignment"] = assignment;
+    return report;
 }
 
 size_t PatternTree::Step::size() const

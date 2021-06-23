@@ -17,7 +17,7 @@ TEST(TestSuiteMapDataflow, TestSimple)
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
-    auto map = PatternTree::Map<double*>::create<DummyMapFunctor>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double*>::create<DummyMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->consumes().size(), 1);
     ASSERT_EQ(map->consumes().at(0), view);
@@ -37,7 +37,7 @@ TEST(TestSuiteMapDataflow, TestAdditionalView)
     std::shared_ptr<PatternTree::View<double*>> viewB = PatternTree::View<double*>::full(fieldB);
 
     std::unique_ptr<TwoViewsMapFunctor> functor(new TwoViewsMapFunctor(viewB));
-    auto map = PatternTree::Map<double*>::create<TwoViewsMapFunctor>(std::move(functor), viewA, 1);
+    auto map = PatternTree::Map<double*>::create<TwoViewsMapFunctor>("dummy", std::move(functor), viewA, 1);
 
     ASSERT_EQ(map->consumes().size(), 2);
     ASSERT_EQ(map->consumes().at(0), viewA);
@@ -55,7 +55,7 @@ TEST(TestSuiteMapFLOPS, TestEmpty)
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
 
     std::unique_ptr<TemplateMapFunctor<double*>> functor(new TemplateMapFunctor<double*>());
-    auto map = PatternTree::Map<double*>::create<TemplateMapFunctor<double*>>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double*>::create<TemplateMapFunctor<double*>>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 0);
     ASSERT_EQ(map->flops(999, false), 0); 
@@ -69,7 +69,7 @@ TEST(TestSuiteMapFLOPS, TestConstant)
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
 
     std::unique_ptr<ConstantCostsMapFunctor> functor(new ConstantCostsMapFunctor());
-    auto map = PatternTree::Map<double*>::create<ConstantCostsMapFunctor>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double*>::create<ConstantCostsMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 1);
     ASSERT_EQ(map->flops(999, false), 1); 
@@ -83,7 +83,7 @@ TEST(TestSuiteMapFLOPS, TestTriangle)
     std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
 
     std::unique_ptr<TriangleCostsMapFunctor> functor(new TriangleCostsMapFunctor());
-    auto map = PatternTree::Map<double**>::create<TriangleCostsMapFunctor>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double**>::create<TriangleCostsMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 2);
     ASSERT_EQ(map->flops(99, false), 200);
@@ -97,7 +97,7 @@ TEST(TestSuiteMapFLOPS, TestTouch)
     std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
 
     std::unique_ptr<CustomTriangleCostsMapFunctor> functor(new CustomTriangleCostsMapFunctor());
-    auto map = PatternTree::Map<double**>::create<CustomTriangleCostsMapFunctor>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double**>::create<CustomTriangleCostsMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 3);
     ASSERT_EQ(map->flops(9, true), 21);
@@ -112,7 +112,7 @@ TEST(TestSuiteMapFLOPS, TestInterpolate)
     std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
 
     std::unique_ptr<CustomTriangleCostsMapFunctor> functor(new CustomTriangleCostsMapFunctor());
-    auto map = PatternTree::Map<double**>::create<CustomTriangleCostsMapFunctor>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double**>::create<CustomTriangleCostsMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 3);
     ASSERT_EQ(map->flops(1, false), 5);

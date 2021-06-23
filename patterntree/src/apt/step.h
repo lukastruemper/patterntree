@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <optional>
 
+#include <nlohmann/json.hpp>
+
 #include "patterns/pattern.h"
 #include "patterns/pattern_split.h"
 #include "cluster/team.h"
@@ -64,6 +66,8 @@ public:
 
 	Step::Iterator begin() { return Iterator( this->patterns_.begin() ); }
     Step::Iterator end()   { return Iterator( this->patterns_.end() ); }
+
+	nlohmann::json to_json();
 
     size_t size() const;
     size_t index() const;

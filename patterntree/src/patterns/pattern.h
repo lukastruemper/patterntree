@@ -18,6 +18,7 @@ struct PatternIndexInfo {
 };
 
 class IPattern {
+std::string identifier_;
 int width_;
 Dataflow flow_in_;
 Dataflow flow_out_;
@@ -26,8 +27,9 @@ protected:
 	std::map<int, PatternIndexInfo> info_;
 
 public:
-	IPattern(Dataflow, Dataflow, int width);
+	IPattern(std::string identifier, Dataflow, Dataflow, int width);
 
+	std::string identifier() const;
 	int width() const;
 	Dataflow consumes() const;
 	Dataflow produces() const;

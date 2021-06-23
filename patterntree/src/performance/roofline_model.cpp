@@ -1,15 +1,84 @@
 #include "roofline_model.h"
 
+#include <limits>
 #include <algorithm>
 #include <functional>
-#include <map>
 
 #include "cluster/cluster.h"
 
-double PatternTree::RooflineModel::runtime()
+using json = nlohmann::json;
+
+PatternTree::RooflineModel::RooflineModel()
+: current_costs_(0), state_(), costs_(), max_costs_()
+{};
+
+double PatternTree::RooflineModel::costs()
 {
-   return this->runtime_;
+   return this->current_costs_;
 };
+
+void PatternTree::RooflineModel::update(PatternTree::Step& step)
+{
+   double max_costs = 0.0;
+   double max_exec_costs = 0.0;
+   double max_net_costs = 0.0;
+
+   std::unordered_map<const Team*, std::pair<double, double>> step_costs;
+   for (auto const& team : step.teams()) {
+      auto patterns = step.assigned(*team);
+
+      double exec_costs = this->execution_costs(patterns, *team);
+      double net_costs = this->network_costs(patterns, *team);
+      double total_costs = (1.0 - std::min(net_costs / exec_costs, ROOFLINE_OVERLAP)) * exec_costs + net_costs;
+
+      if (total_costs > max_costs) {
+            max_costs = total_costs;
+            max_exec_costs = exec_costs;
+            max_net_costs = net_costs;
+      }
+
+      step_costs.insert({team.get(), std::make_pair(exec_costs, net_costs)});
+   }
+
+   this->costs_.push_back(step_costs);
+   this->max_costs_.push_back(std::make_pair(max_exec_costs, max_net_costs));
+   this->current_costs_ += max_costs;
+
+   this->state_.update(step);
+};
+
+json PatternTree::RooflineModel::report()
+{
+   json report = json::object();
+   report["steps"] = this->costs_.size();
+   report["costs"] = this->current_costs_;
+   
+   json steps = json::array();
+   for (size_t i = 0; i < this->costs_.size(); i++) {
+      auto costs = this->costs_.at(i);
+      auto max_costs = this->max_costs_.at(i);
+
+      json step = json::object();
+      step["step"] = i;
+      step["max_costs"] = { max_costs.first, max_costs.second };
+
+      json teams = json::array();
+      for (auto const& it : costs) {
+         json team;
+         team["processor"] = it.first->processor().to_json();
+         team["cores"] = it.first->cores();
+         team["costs"] = { it.second.first, it.second.first };
+
+         teams.push_back(team);
+      }
+
+      step["costs"] = teams;
+      steps.push_back(step);
+   }
+
+   report["step-costs"] = steps;
+   return report;
+}
 
 double PatternTree::RooflineModel::execution_costs(const std::vector<std::reference_wrapper<const PatternTree::PatternSplit>>& splits, const PatternTree::Team& team)
 {
@@ -160,29 +229,4 @@ double PatternTree::RooflineModel::network_costs(const std::vector<std::referenc
    }
 
    return total_costs;
-};
-
-void PatternTree::RooflineModel::update(PatternTree::Step& step)
-{
-   double max_costs = 0.0;
-   double max_exec_costs = 0.0;
-   double max_net_costs = 0.0;
-
-   for (auto const& team : step.teams()) {
-      auto patterns = step.assigned(*team);
-
-      double exec_costs = this->execution_costs(patterns, *team);
-      double net_costs = this->network_costs(patterns, *team);
-      double total_costs = (1.0 - std::min(net_costs / exec_costs, ROOFLINE_OVERLAP)) * exec_costs + net_costs;
-
-      if (total_costs > max_costs) {
-            max_costs = total_costs;
-            max_exec_costs = exec_costs;
-            max_net_costs = net_costs;
-      }
-   }
-
-   this->runtime_ += max_costs;
-   this->costs_.push_back(std::make_pair(max_exec_costs, max_net_costs));
-   this->state_.update(step);
 };

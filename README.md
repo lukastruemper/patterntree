@@ -48,7 +48,7 @@ struct IncrementFunctor : public PatternTree::MapFunctor<double*> {
 auto x = PatternTree::APT::source<double*>("x", 256);
 
 std::unique_ptr<MXVFunctor> functor(new IncrementFunctor());    
-PatternTree::APT::map<double*, MXVFunctor>(std::move(functor), x);
+PatternTree::APT::map<double*, MXVFunctor>("increment", std::move(functor), x);
 ```
 
 #### Algorithmic Efficiencies
@@ -101,7 +101,7 @@ int main() {
 
     // MXV as map pattern
     std::unique_ptr<MXVFunctor> functor(new MXVFunctor(M, x));    
-    PatternTree::APT::map<double*, MXVFunctor>(std::move(functor), res);
+    PatternTree::APT::map<double*, MXVFunctor>("mxv", std::move(functor), res);
 
     // END APT
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
@@ -181,7 +181,7 @@ int main() {
     for (int k = 0; k < K; k++)
     {
         std::unique_ptr<JacobiFunctor> functor(new JacobiFunctor(A, b, x_));    
-        PatternTree::APT::map<double*, JacobiFunctor>(std::move(functor), x);
+        PatternTree::APT::map<double*, JacobiFunctor>("jacobi", std::move(functor), x);
 
         x.swap(x_);
     }

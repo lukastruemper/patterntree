@@ -15,7 +15,7 @@ TEST(TestSuitePatternSplit, TestConstructDefault)
     std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
-    auto map = PatternTree::Map<double*>::create<DummyMapFunctor>(std::move(functor), view, 1);
+    auto map = PatternTree::Map<double*>::create<DummyMapFunctor>("dummy", std::move(functor), view, 1);
     std::shared_ptr<PatternTree::Map<double*>> map_ = std::move(map);
 
     PatternTree::PatternSplit split(map_);
@@ -39,7 +39,7 @@ TEST(TestSuitePatternSplit, TestConstructMultipleViewsDefault)
     std::shared_ptr<PatternTree::View<double*>> viewB = PatternTree::View<double*>::full(dataB);
 
     std::unique_ptr<TwoViewsMapFunctor> functor(new TwoViewsMapFunctor(viewB));
-    auto map = PatternTree::Map<double*>::create<TwoViewsMapFunctor>(std::move(functor), viewA, 1);
+    auto map = PatternTree::Map<double*>::create<TwoViewsMapFunctor>("dummy", std::move(functor), viewA, 1);
     std::shared_ptr<PatternTree::Map<double*>> map_ = std::move(map);
 
     PatternTree::PatternSplit split(map_);

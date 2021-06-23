@@ -52,8 +52,8 @@ static Dataflow out_data(std::shared_ptr<IView> field)
 };
 
 public:
-	Map(std::unique_ptr<MapFunctor<D>> func, std::shared_ptr<View<D>> field, Dataflow in_data, Dataflow out_data)
-	: 	IPattern(in_data, out_data, field->shape().at(0)),
+	Map(std::string identifier, std::unique_ptr<MapFunctor<D>> func, std::shared_ptr<View<D>> field, Dataflow in_data, Dataflow out_data)
+	: 	IPattern(identifier, in_data, out_data, field->shape().at(0)),
 		func_(std::move(func)),
 		field_(field)
 	{};
@@ -89,11 +89,11 @@ public:
 	};
 	
 	template<typename Functor>
-	static std::unique_ptr<Map<D>> create(std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field, size_t interpolation_frequency) requires MAPFUNCTOR<Functor, D>
+	static std::unique_ptr<Map<D>> create(std::string identifier, std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field, size_t interpolation_frequency) requires MAPFUNCTOR<Functor, D>
 	{
 		Dataflow in_flow = in_data(*functor, field);
 		Dataflow out_flow = out_data(field);
-		std::unique_ptr<Map<D>> map(new Map<D>(std::move(functor), field, in_flow, out_flow));
+		std::unique_ptr<Map<D>> map(new Map<D>(identifier, std::move(functor), field, in_flow, out_flow));
 
 		// Gather info
 		std::vector<int> shape = field->shape();

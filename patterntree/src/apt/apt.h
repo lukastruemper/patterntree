@@ -7,8 +7,13 @@
 #include <string>
 #include <math.h> 
 
+#include <ctime>
+#include <unistd.h>
+
 #include <iterator>
 #include <cstddef> 
+
+#include <nlohmann/json.hpp>
 
 #include "apt/step.h"
 #include "data/data.h"
@@ -81,6 +86,8 @@ public:
 
 	void optimize(IOptimizer& optimizer);
 	double evaluate(IPerformanceModel& model);
+
+	nlohmann::json to_json();
 	void summary();
 
 	static void initialize(std::shared_ptr<Cluster> cluster);
@@ -160,9 +167,35 @@ public:
 	}
 
 	template<typename D, typename Functor>
-	static void map(std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field, size_t interpolation_fequency) requires MAPFUNCTOR<Functor, D>
+	static void map(std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field, size_t interpolation_frequency) requires MAPFUNCTOR<Functor, D>
 	{
-		auto map = Map<D>::create(std::move(functor), field, interpolation_fequency);
+    	static const char alphanum[] =
+        	"0123456789"
+        	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        	"abcdefghijklmnopqrstuvwxyz";
+    
+    	srand( (unsigned) time(NULL) * getpid());
+
+		std::string identifier;
+    	identifier.reserve(18);
+
+    	for (int i = 0; i < 18; ++i) 
+        	identifier += alphanum[rand() % (sizeof(alphanum) - 1)];
+
+		map(identifier, std::move(functor), field, interpolation_frequency);
+	}
+
+	template<typename D, typename Functor>
+	static void map(std::string identifier, std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field) requires MAPFUNCTOR<Functor, D>
+	{
+		size_t frequency = instance->operation_interpolation_frequency_;
+		map(identifier, std::move(functor), field, frequency);
+	}
+
+	template<typename D, typename Functor>
+	static void map(std::string identifier, std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field, size_t interpolation_frequency) requires MAPFUNCTOR<Functor, D>
+	{
+		auto map = Map<D>::create(identifier, std::move(functor), field, interpolation_frequency);
 		
 		if (instance->flow_.size() == 0 || !instance->synchronization_efficiency_)
 		{

@@ -178,16 +178,16 @@ TEST(TestSuiteKMeans, TestCPU)
     for (size_t i = 0; i < niters; i++) {
 
         std::unique_ptr<KMeansAssignFunctor> assign_functor_A(new KMeansAssignFunctor(points_A, centroids));    
-        PatternTree::APT::map<int*, KMeansAssignFunctor>(std::move(assign_functor_A), assignment_A);
+        PatternTree::APT::map<int*, KMeansAssignFunctor>("kmeans_assign_lower", std::move(assign_functor_A), assignment_A);
 
         std::unique_ptr<KMeansAssignFunctor> assign_functor_B(new KMeansAssignFunctor(points_B, centroids));    
-        PatternTree::APT::map<int*, KMeansAssignFunctor>(std::move(assign_functor_B), assignment_B);
+        PatternTree::APT::map<int*, KMeansAssignFunctor>("kmeans_assign_upper", std::move(assign_functor_B), assignment_B);
 
         std::unique_ptr<KMeansUpdateFunctor> update_functor_A(new KMeansUpdateFunctor(K, points, assignment));    
-        PatternTree::APT::map<double**, KMeansUpdateFunctor>(std::move(update_functor_A), centroids_A);
+        PatternTree::APT::map<double**, KMeansUpdateFunctor>("kmeans_update_lower", std::move(update_functor_A), centroids_A);
 
         std::unique_ptr<KMeansUpdateFunctor> update_functor_B(new KMeansUpdateFunctor(K, points, assignment));    
-        PatternTree::APT::map<double**, KMeansUpdateFunctor>(std::move(update_functor_B), centroids_B);
+        PatternTree::APT::map<double**, KMeansUpdateFunctor>("kmeans_update_upper", std::move(update_functor_B), centroids_B);
     }
 
 	// END APT
@@ -199,7 +199,7 @@ TEST(TestSuiteKMeans, TestCPU)
     PatternTree::RooflineModel model;
     double runtime = apt->evaluate(model);
 
-    double runtime_ratio = runtime / 9.569336;
+    double runtime_ratio = runtime / 9.594;
     ASSERT_TRUE(runtime_ratio < 2 && runtime_ratio > 0.5);
 }
 
@@ -229,16 +229,16 @@ TEST(TestSuiteKMeans, TestGPU)
     for (size_t i = 0; i < niters; i++) {
 
         std::unique_ptr<KMeansAssignFunctor> assign_functor_A(new KMeansAssignFunctor(points_A, centroids));    
-        PatternTree::APT::map<int*, KMeansAssignFunctor>(std::move(assign_functor_A), assignment_A);
+        PatternTree::APT::map<int*, KMeansAssignFunctor>("kmeans_assign_lower", std::move(assign_functor_A), assignment_A);
 
         std::unique_ptr<KMeansAssignFunctor> assign_functor_B(new KMeansAssignFunctor(points_B, centroids));    
-        PatternTree::APT::map<int*, KMeansAssignFunctor>(std::move(assign_functor_B), assignment_B);
+        PatternTree::APT::map<int*, KMeansAssignFunctor>("kmeans_assign_upper", std::move(assign_functor_B), assignment_B);
 
         std::unique_ptr<KMeansUpdateFunctor> update_functor_A(new KMeansUpdateFunctor(K, points, assignment));    
-        PatternTree::APT::map<double**, KMeansUpdateFunctor>(std::move(update_functor_A), centroids_A);
+        PatternTree::APT::map<double**, KMeansUpdateFunctor>("kmeans_update_lower", std::move(update_functor_A), centroids_A);
 
         std::unique_ptr<KMeansUpdateFunctor> update_functor_B(new KMeansUpdateFunctor(K, points, assignment));    
-        PatternTree::APT::map<double**, KMeansUpdateFunctor>(std::move(update_functor_B), centroids_B);
+        PatternTree::APT::map<double**, KMeansUpdateFunctor>("kmeans_update_upper", std::move(update_functor_B), centroids_B);
     }
 
 	// END APT
@@ -250,6 +250,6 @@ TEST(TestSuiteKMeans, TestGPU)
     PatternTree::RooflineModel model;
     double runtime = apt->evaluate(model);
 
-    double runtime_ratio = runtime / 3.914985;
+    double runtime_ratio = runtime / 3.921;
     ASSERT_TRUE(runtime_ratio < 2 && runtime_ratio > 0.5);
 }

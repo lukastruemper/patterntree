@@ -1,5 +1,8 @@
 #include "processor.h"
 
+#include "cluster/device.h"
+#include "cluster/node.h"
+
 PatternTree::Processor::Processor(int cores, int arithmetic_units, double frequency,
     double cache_size, double cache_latency, double cache_bandwidth)
 {
@@ -45,6 +48,19 @@ double PatternTree::Processor::cache_bandwidth() const
 const PatternTree::Device& PatternTree::Processor::device() const
 {
     return *(this->device_.lock());
+}
+
+json PatternTree::Processor::to_json() const
+{
+    json processor;
+    processor["frequency"] = this->frequency_;
+    processor["cores"] = this->cores_;
+    
+    auto device = this->device_.lock();
+    processor["device"] = device->identifier();
+    processor["node"] = device->node().identifier();
+
+    return processor;
 }
 
 std::shared_ptr<PatternTree::Processor> PatternTree::Processor::parse(std::string path)
