@@ -17,6 +17,10 @@
 
 #include "apt/step.h"
 #include "data/data.h"
+#include "data/value.h"
+#include "data/backend/symbolic_value.h"
+#include "data/backend/kokkos_value.h"
+
 #include "data/view.h"
 #include "patterns/map.h"
 #include "patterns/pattern.h"
@@ -42,11 +46,27 @@ int synchronization_efficiency_length_;
 size_t operation_interpolation_frequency_;
 size_t data_interpolation_frequency_;
 std::shared_ptr<Cluster> cluster_;
-std::vector<std::shared_ptr<IData>> sources_;
+
+std::vector<std::shared_ptr<IData>> data_;
 std::vector<std::unique_ptr<Step>> flow_;
 
 public:
 	
+	/***** APT: Methods *****/
+
+	size_t size() const;
+
+	const Cluster& cluster() const;
+
+	std::vector<std::shared_ptr<IData>> data() const;
+			
+	void optimize(IOptimizer& optimizer);
+	
+	double evaluate(IPerformanceModel& model);
+
+	nlohmann::json to_json();
+	
+	/***** APT: ITERATOR *****/
 	struct Iterator 
 	{
 		using iterator_category = std::input_iterator_tag;
@@ -77,87 +97,103 @@ public:
 			std::vector<std::unique_ptr<Step>>::iterator iter_;
 	};
 
-	size_t size();
-	const Cluster& cluster();
-	const std::vector<std::shared_ptr<IData>>& sources();
-	
 	APT::Iterator begin() { return Iterator( this->flow_.begin() ); }
     APT::Iterator end()   { return Iterator( this->flow_.end() ); }
 
-	void optimize(IOptimizer& optimizer);
-	double evaluate(IPerformanceModel& model);
+	/***** APT: INIT & COMPILE *****/
 
-	nlohmann::json to_json();
-	void summary();
+	static void init(std::shared_ptr<Cluster> cluster);
+	static void init(std::shared_ptr<Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency);
+	static void init(std::shared_ptr<Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency, bool synchronization_efficiency);
 
-	static void initialize(std::shared_ptr<Cluster> cluster);
-	static void initialize(std::shared_ptr<Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency);
-	static void initialize(std::shared_ptr<Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency, bool synchronization_efficiency);
+	static std::unique_ptr<APT> compile();
+
+	/***** APT: HYPERPARAMETERS *****/
 
 	static void operation_interpolation_frequency(size_t frequency);
 	static void data_interpolation_frequency(size_t frequency);
 	static void synchronization_efficiency(bool enabled);
 	static void synchronization_efficiency_length(int length);
 
-	static std::unique_ptr<APT> compile();
+	/***** APT: DATA *****/
 
 	template<typename D>
-	static std::shared_ptr<View<D>> source(std::string name, int dim0) requires ONEDIM<D>
+	static std::shared_ptr<View<D>> data(std::string identifier, size_t dim0) requires ONEDIM<D>
 	{
-		size_t frequency = APT::instance->data_interpolation_frequency_;
-		return APT::source<D>(name, dim0, frequency);
+		return APT::data<D>(identifier, dim0, APT::instance->data_interpolation_frequency_);
 	}
 
 	template<typename D>
-	static std::shared_ptr<View<D>> source(std::string name, int dim0, size_t interpolation_frequency) requires ONEDIM<D>
+	static std::shared_ptr<View<D>> data(std::string identifier, size_t dim0, size_t interpolation_frequency) requires ONEDIM<D>
 	{
+		std::shared_ptr<Data<D>> data = APT::symbolic<D>(identifier, dim0, interpolation_frequency);
+		APT::instance->data_.push_back(data);
 
-		std::shared_ptr<Data<D>> data(new Data<D>(name, dim0));
-		size_t basis_split_0_ = std::max(dim0 / interpolation_frequency, interpolation_frequency);
-		data->split_size_ = { basis_split_0_ };
-		for (size_t i = 0; i < dim0; i += basis_split_0_)
+		auto view = View<D>::full(data);
+		return view;
+	}
+
+	template<typename D>
+	static std::shared_ptr<View<D>> data(std::string identifier, size_t dim0, size_t dim1) requires TWODIM<D>
+	{
+		return APT::data<D>(identifier, dim0, dim1, APT::instance->data_interpolation_frequency_);
+	}
+
+	template<typename D>
+	static std::shared_ptr<View<D>> data(std::string identifier, size_t dim0, size_t dim1, size_t interpolation_frequency) requires TWODIM<D>
+	{
+		std::shared_ptr<Data<D>> data = APT::symbolic<D>(identifier, dim0, dim1, interpolation_frequency);
+		APT::instance->data_.push_back(data);
+
+		auto view = View<D>::full(data);
+		return view;
+	}
+
+	template<typename D>
+	static std::shared_ptr<Data<D>> symbolic(std::string identifier, size_t dim0, size_t interpolation_frequency) requires ONEDIM<D>
+	{
+		std::unique_ptr<SymbolicValue<D>> value(new SymbolicValue<D>(identifier, dim0));
+		std::shared_ptr<Data<D>> data(new Data<D>(std::move(value)));
+
+		size_t split_size_0 = std::max(dim0 / interpolation_frequency, interpolation_frequency);
+		data->split_size_.push_back(split_size_0);
+		for (size_t i = 0; i < dim0; i += split_size_0)
 		{
-			size_t length_0 = std::min(basis_split_0_, dim0 - i);
+			size_t length_0 = std::min(split_size_0, dim0 - i);
 
 			std::shared_ptr<View<D>> basis_view = View<D>::slice(data, std::make_pair(i, i + length_0));
 			data->basis_.push_back(basis_view);
 		}
-		APT::instance->sources_.push_back(data);
 
-		auto view = View<D>::full(data);
-		return view;
+		return data;
 	};
 
 	template<typename D>
-	static std::shared_ptr<View<D>> source(std::string name, int dim0, int dim1) requires TWODIM<D>
+	static std::shared_ptr<Data<D>> symbolic(std::string identifier, size_t dim0, size_t dim1, size_t interpolation_frequency) requires TWODIM<D>
 	{
-		size_t frequency = APT::instance->data_interpolation_frequency_;
-		return APT::source<D>(name, dim0, dim1, frequency);
-	}
+		std::unique_ptr<SymbolicValue<D>> value(new SymbolicValue<D>(identifier, dim0, dim1));
+		std::shared_ptr<Data<D>> data(new Data<D>(std::move(value)));
 
-	template<typename D>
-	static std::shared_ptr<View<D>> source(std::string name, int dim0, int dim1, size_t interpolation_frequency) requires TWODIM<D>
-	{
-		std::shared_ptr<Data<D>> data(new Data<D>(name, dim0, dim1));
-		size_t basis_split_0_ = std::max(dim0 / interpolation_frequency, interpolation_frequency);
-		size_t basis_split_1_ = std::max(dim1 / interpolation_frequency, interpolation_frequency);
-		data->split_size_ = { basis_split_0_, basis_split_1_ };
-		for (size_t i = 0; i < dim0; i += basis_split_0_)
+		size_t split_size_0_ = std::max(dim0 / interpolation_frequency, interpolation_frequency);
+		size_t split_size_1_ = std::max(dim1 / interpolation_frequency, interpolation_frequency);
+		data->split_size_.push_back(split_size_0_);
+		data->split_size_.push_back(split_size_1_);
+		for (size_t i = 0; i < dim0; i += split_size_0_)
 		{
-			size_t length_0 = std::min(basis_split_0_, dim0 - i);
-			for (size_t j = 0; j < dim1; j += basis_split_1_)
+			size_t length_0 = std::min(split_size_0_, dim0 - i);
+			for (size_t j = 0; j < dim1; j += split_size_1_)
 			{
-				size_t length_1 = std::min(basis_split_1_, dim1 - j);
+				size_t length_1 = std::min(split_size_1_, dim1 - j);
 
 				std::shared_ptr<View<D>> basis_view = View<D>::slice(data, std::make_pair(i, i + length_0), std::make_pair(j, j + length_1));
 				data->basis_.push_back(basis_view);
 			}
 		}
-		APT::instance->sources_.push_back(data);
 
-		auto view = View<D>::full(data);
-		return view;
+		return data;
 	};
+
+	/***** APT: PATTERNS *****/
 
 	template<typename D, typename Functor>
 	static void map(std::unique_ptr<Functor> functor, std::shared_ptr<View<D>> field) requires MAPFUNCTOR<Functor, D>

@@ -37,12 +37,12 @@ int main() {
 	std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");
     
 	// BEGIN APT
-	PatternTree::APT::initialize(cluster);
+	PatternTree::APT::init(cluster);
 
 	// Declare data
-    auto M = PatternTree::APT::source<double**>("M", 256, 256);
-    auto x = PatternTree::APT::source<double*>("x", 256);
-    auto res = PatternTree::APT::source<double*>("res", 256);
+    auto M = PatternTree::APT::data<double**>("M", 256, 256);
+    auto x = PatternTree::APT::data<double*>("x", 256);
+    auto res = PatternTree::APT::data<double*>("res", 256);
 
 	// MXV as map pattern
     std::unique_ptr<MXVFunctor> functor(new MXVFunctor(M, x));    

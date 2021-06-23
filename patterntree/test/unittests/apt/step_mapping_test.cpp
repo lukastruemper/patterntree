@@ -15,9 +15,9 @@
 TEST(TestSuiteStepMapping, TestDefaultSplit)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double*>("field", 128);
+	auto view = PatternTree::APT::data<double*>("field", 128);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor), view);
@@ -45,10 +45,10 @@ TEST(TestSuiteStepMapping, TestDefaultSplit)
 TEST(TestSuiteStepMapping, TestSplit)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto viewA = PatternTree::APT::source<double*>("fieldA", 130);
-	auto viewB = PatternTree::APT::source<double*>("fieldB", 130);
+	auto viewA = PatternTree::APT::data<double*>("fieldA", 130);
+	auto viewB = PatternTree::APT::data<double*>("fieldB", 130);
 
     std::unique_ptr<SplitMapFunctor> functor(new SplitMapFunctor(viewB));
     PatternTree::APT::map<double*, SplitMapFunctor>(std::move(functor), viewA);
@@ -99,9 +99,9 @@ TEST(TestSuiteStepMapping, TestAssignAndFreeSplit)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
        
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double*>("field", 128);
+	auto view = PatternTree::APT::data<double*>("field", 128);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor), view);
@@ -146,9 +146,9 @@ TEST(TestSuiteStepMapping, TestAssignAndFreePattern)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
        
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double*>("field", 128);
+	auto view = PatternTree::APT::data<double*>("field", 128);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor), view);
@@ -191,10 +191,10 @@ TEST(TestSuiteStepMapping, TestAssignAndFreeMultiple)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
        
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto viewA = PatternTree::APT::source<double*>("field", 128);
-	auto viewB = PatternTree::APT::source<double*>("field", 128);
+	auto viewA = PatternTree::APT::data<double*>("field", 128);
+	auto viewB = PatternTree::APT::data<double*>("field", 128);
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functorA), viewA);

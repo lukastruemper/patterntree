@@ -1,63 +1,101 @@
 #pragma once
 
-#include <string>
-#include <vector>
 #include <memory>
-#include <unordered_set>
-#include <algorithm>
-#include <math.h>
+#include <vector>
 
 #include "data/data_concepts.h"
+#include "data/value.h"
+#include "data/backend/symbolic_value.h"
+#include "data/backend/kokkos_value.h"
 
-namespace PatternTree
-{
+namespace PatternTree {
 
 class IView;
+class APT;
 
 class IData {
 
-std::string name_;
-std::vector<int> shape_;
-
 protected:
-	bool symbolic_;
-
+	std::unique_ptr<IValue> value_;
 	std::vector<size_t> split_size_;
 	std::vector<std::shared_ptr<IView>> basis_;
 
 public:
+	friend class APT;
 
-	virtual ~IData() {};
-	IData(std::string, int dim0, int dim1);
+    IData(std::unique_ptr<IValue> value);
 
-	std::string name() const;
-	bool is_symbolic() const;
-	std::vector<int> shape() const;
+	/**
+	 * Returns the underlying value.
+	 *
+	 * @return value
+	 */
+	IValue& value() const;
 
-	std::vector<std::shared_ptr<IView>> basis() const
-	{
-		return this->basis_;
-	};
+	/**
+	 * Returns the identifier of the value.
+	 *
+	 * @return identifier
+	 */
+	std::string identifier() const;
 
-	std::vector<size_t> split_size() const
-	{
-		return this->split_size_;
-	}
+	/**
+	 * Returns the shape of the value.
+	 *
+	 * @return shape
+	 */
+	std::vector<size_t> shape() const;
+
+	/**
+	 * Returns a representation of the value over the basis views.
+	 *
+	 * @return basis
+	 */
+	std::vector<std::shared_ptr<IView>> basis() const;
+
+	std::vector<size_t> split_size() const;
+
+	/**
+	 * Compiles the data, i.e., replace its symbolic values with actual memory.
+	 */
+	virtual void compile() = 0;
 
 };
 
 template<typename D>
 class Data : public IData {
 
-public:
-	friend class APT;
+void compile_() requires ONEDIM<D>
+{
+	// TODO: Check if symbolic
 
-	Data(std::string name, int dim0) requires ONEDIM<D>
-	: IData(name, dim0, 0) {}
-
-	Data(std::string name, int dim0, int dim1) requires TWODIM<D>
-	: IData(name, dim0, dim1)
-	{}
-
+	this->value_.reset(new KokkosValue<D>(this->identifier(), this->shape()[0]));
 };
+
+void compile_() requires TWODIM<D>
+{
+	// TODO: Check if symbolic
+
+	this->value_.reset(new KokkosValue<D>(this->identifier(), this->shape()[0], this->shape()[1]));
+};
+
+public:
+	Data(std::unique_ptr<IValue> value) : IData(std::move(value)) {};
+
+	void compile() override { this->compile_(); };
+
+	Value<D>& value() const
+	{
+		return *(static_cast<Value<D>*>(this->value_.get()));
+	}
+
+	remove_all_pointers_t<D>& operator () (size_t dim0) requires ONEDIM<D> {
+        return this->value().operator()(dim0);
+    };
+
+    remove_all_pointers_t<D>& operator () (size_t dim0, size_t dim1) requires TWODIM<D> {
+        return this->value().operator()(dim0, dim1);
+    };
+};
+
 }

@@ -23,9 +23,9 @@ TEST(TestSuiteRooflineExecutionCosts, TestZero)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
 
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double*>("field", 100);
+	auto view = PatternTree::APT::data<double*>("field", 100);
     
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor), view, 100);
@@ -51,9 +51,9 @@ TEST(TestSuiteRooflineExecutionCosts, TestConstant)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
 
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double*>("field", 100);
+	auto view = PatternTree::APT::data<double*>("field", 100);
 
     std::unique_ptr<ConstantCostsMapFunctor> functor(new ConstantCostsMapFunctor());
     PatternTree::APT::map<double*, ConstantCostsMapFunctor>(std::move(functor), view, 100);
@@ -81,9 +81,9 @@ TEST(TestSuiteRooflineExecutionCosts, TestTriangle)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
 
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double**>("field", 100, 2);
+	auto view = PatternTree::APT::data<double**>("field", 100, 2);
 
     std::unique_ptr<TriangleCostsMapFunctor> functor(new TriangleCostsMapFunctor());
     PatternTree::APT::map<double**, TriangleCostsMapFunctor>(std::move(functor), view, 100);
@@ -112,9 +112,9 @@ TEST(TestSuiteRooflineNetworkCosts, TestInitial)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
 
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto view = PatternTree::APT::source<double*>("field", 100);
+	auto view = PatternTree::APT::data<double*>("field", 100);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor), view, 100);
@@ -145,9 +145,9 @@ TEST(TestSuiteRooflineNetworkCosts, TestCache)
     std::shared_ptr<PatternTree::Team> teamA(new PatternTree::Team(processor, 1));
     std::shared_ptr<PatternTree::Team> teamB(new PatternTree::Team(processor, 1));
 
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto view = PatternTree::APT::source<double*>("field", 100);
+	auto view = PatternTree::APT::data<double*>("field", 100);
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functorA), view, 100);
@@ -186,9 +186,9 @@ TEST(TestSuiteRooflineNetworkCosts, TestMainMemory)
     std::shared_ptr<PatternTree::Team> teamA(new PatternTree::Team(processorA, 1));
     std::shared_ptr<PatternTree::Team> teamB(new PatternTree::Team(processorB, 1));
 
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto view = PatternTree::APT::source<double*>("field", 100);
+	auto view = PatternTree::APT::data<double*>("field", 100);
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functorA), view, 100);
@@ -225,11 +225,11 @@ TEST(TestSuiteRooflineNetworkCosts, TestSharedData)
     std::shared_ptr<PatternTree::Processor> processor = (device->processors().begin())->second;
     std::shared_ptr<PatternTree::Team> team(new PatternTree::Team(processor, 1));
 
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto viewA = PatternTree::APT::source<double*>("field", 8192 * 8192);
-	auto viewB = PatternTree::APT::source<double*>("field", 512);
-	auto viewC = PatternTree::APT::source<double*>("field", 512);
+	auto viewA = PatternTree::APT::data<double*>("field", 8192 * 8192);
+	auto viewB = PatternTree::APT::data<double*>("field", 512);
+	auto viewC = PatternTree::APT::data<double*>("field", 512);
 
     std::unique_ptr<TwoViewsMapFunctor> functorA(new TwoViewsMapFunctor(viewA));
     PatternTree::APT::map<double*, TwoViewsMapFunctor>(std::move(functorA), viewB, 2);

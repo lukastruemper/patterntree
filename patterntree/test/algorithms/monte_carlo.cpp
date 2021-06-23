@@ -98,9 +98,9 @@ private:
 std::unique_ptr<PatternTree::APT> monte_carlo(long draws, long estimates, int splits)
 {    
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 1, estimates / splits, true);
+    PatternTree::APT::init(cluster, 1, estimates / splits, true);
 
-    auto temp = PatternTree::APT::source<double*>("temp", estimates);
+    auto temp = PatternTree::APT::data<double*>("temp", estimates);
 
     for (int i = 0; i < splits; i++) {
         auto split = PatternTree::View<double*>::slice(temp->data(), std::make_pair(i * estimates / splits, (i + 1) * estimates / splits));
@@ -109,7 +109,7 @@ std::unique_ptr<PatternTree::APT> monte_carlo(long draws, long estimates, int sp
         PatternTree::APT::map<double*, MonteCarloFunctor>("monte_carlo_map", std::move(functor), split);
     }
 
-    auto res = PatternTree::APT::source<double*>("res", 1);
+    auto res = PatternTree::APT::data<double*>("res", 1);
     std::unique_ptr<MonteCarloReduceFunctor> functor(new MonteCarloReduceFunctor(temp));    
     PatternTree::APT::map<double*, MonteCarloReduceFunctor>("monte_carlo_reduce", std::move(functor), res);
 

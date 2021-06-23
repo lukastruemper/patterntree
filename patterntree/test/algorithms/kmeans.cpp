@@ -161,11 +161,11 @@ TEST(TestSuiteKMeans, TestCPU)
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g_simple.json");
     
 	// BEGIN APT
-	PatternTree::APT::initialize(cluster, 2, 2);
+	PatternTree::APT::init(cluster, 2, 2);
 
-    auto points = PatternTree::APT::source<double**>("points", N, 2);
-    auto centroids = PatternTree::APT::source<double**>("centroids", K, 2);
-    auto assignment = PatternTree::APT::source<int*>("assignment", N);
+    auto points = PatternTree::APT::data<double**>("points", N, 2);
+    auto centroids = PatternTree::APT::data<double**>("centroids", K, 2);
+    auto assignment = PatternTree::APT::data<int*>("assignment", N);
 
     auto points_A = PatternTree::View<double**>::slice(points->data(), std::make_pair(0, N / 2), std::make_pair(0, 2));
     auto points_B = PatternTree::View<double**>::slice(points->data(), std::make_pair(N / 2, N), std::make_pair(0, 2));
@@ -212,11 +212,11 @@ TEST(TestSuiteKMeans, TestGPU)
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g_simple.json");
     
 	// BEGIN APT
-	PatternTree::APT::initialize(cluster, 2, 2);
+	PatternTree::APT::init(cluster, 2, 2);
 
-    auto points = PatternTree::APT::source<double**>("points", N, 2);
-    auto centroids = PatternTree::APT::source<double**>("centroids", K, 2);
-    auto assignment = PatternTree::APT::source<int*>("assignment", N);
+    auto points = PatternTree::APT::data<double**>("points", N, 2);
+    auto centroids = PatternTree::APT::data<double**>("centroids", K, 2);
+    auto assignment = PatternTree::APT::data<int*>("assignment", N);
 
     auto points_A = PatternTree::View<double**>::slice(points->data(), std::make_pair(0, N / 2), std::make_pair(0, 2));
     auto points_B = PatternTree::View<double**>::slice(points->data(), std::make_pair(N / 2, N), std::make_pair(0, 2));

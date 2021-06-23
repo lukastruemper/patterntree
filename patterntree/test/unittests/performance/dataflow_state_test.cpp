@@ -23,10 +23,10 @@ TEST(TestSuiteDataflowState, TestFirstStep)
 
     // BEGIN APT
 
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto viewA = PatternTree::APT::source<double*>("fieldA", 36);
-	auto viewB = PatternTree::APT::source<double*>("fieldB", 36);
+	auto viewA = PatternTree::APT::data<double*>("fieldA", 36);
+	auto viewB = PatternTree::APT::data<double*>("fieldB", 36);
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functorA), viewA);
@@ -80,9 +80,9 @@ TEST(TestSuiteDataflowState, TestOverwrite)
 
     // BEGIN APT
 
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto view = PatternTree::APT::source<double*>("fieldA", 36);
+	auto view = PatternTree::APT::data<double*>("fieldA", 36);
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functorA), view);
@@ -139,11 +139,11 @@ TEST(TestSuiteDataflowState, TestSharedView)
 
     // BEGIN APT
 
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto viewA = PatternTree::APT::source<double*>("fieldA", 32);
-	auto viewB = PatternTree::APT::source<double*>("fieldB", 32);
-	auto viewC = PatternTree::APT::source<double*>("fieldC", 32);
+	auto viewA = PatternTree::APT::data<double*>("fieldA", 32);
+	auto viewB = PatternTree::APT::data<double*>("fieldB", 32);
+	auto viewC = PatternTree::APT::data<double*>("fieldC", 32);
 
     std::unique_ptr<TwoViewsMapFunctor> functorA(new TwoViewsMapFunctor(viewA));
     PatternTree::APT::map<double*, TwoViewsMapFunctor>(std::move(functorA), viewB);
@@ -200,9 +200,9 @@ TEST(TestSuiteDataflowState, TestSubviews)
 
     // BEGIN APT
 
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto view = PatternTree::APT::source<double*>("fieldA", 128);
+	auto view = PatternTree::APT::data<double*>("fieldA", 128);
     auto view_lower = PatternTree::View<double*>::slice(view->data(), std::make_pair(0, 64));
     auto view_upper = PatternTree::View<double*>::slice(view->data(), std::make_pair(64, 128));
 

@@ -13,9 +13,9 @@ Basically, PatternTree is a high-level, data-centric parallel programming framew
 PatternTree operates in two stages: In the first phase, in which the program is defined, data is a symbolic concept. This means, data is interpreted as a placeholder without a specific value. Operations and parallel patterns applied to this data are added to the APT. In the execution phase, an initial value must be provided for the data and the operations are now executed on the values as defined in the APT.
 
 ```c++
-PatternTree::APT::initialize(cluster);
+PatternTree::APT::init(cluster);
 
-auto x = PatternTree::APT::source<double*>("x", 256);
+auto x = PatternTree::APT::data<double*>("x", 256);
 x =  2 * x + 1;
 
 std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
@@ -29,7 +29,7 @@ apt->execute({'x' : value});
 In general, data is accessed through views in a program. When defining new data, a full view on the data is returned. It is however often convenient to define subviews, when working on a subset of the data. Beside just facilitating the handling of data, subviews also allow for stronger assumptions in the optimizations regarding the parts of the data that need to be transferred between processors.
 
 ```c++
-auto view = PatternTree::APT::source<double*>("x", 256);
+auto view = PatternTree::APT::data<double*>("x", 256);
 auto subview = PatternTree::View<double*>::slice(view->data(), std::make_pair(32,96));
 ```
 
@@ -45,7 +45,7 @@ struct IncrementFunctor : public PatternTree::MapFunctor<double*> {
     };
 };
 
-auto x = PatternTree::APT::source<double*>("x", 256);
+auto x = PatternTree::APT::data<double*>("x", 256);
 
 std::unique_ptr<MXVFunctor> functor(new IncrementFunctor());    
 PatternTree::APT::map<double*, MXVFunctor>("increment", std::move(functor), x);
@@ -92,12 +92,12 @@ int main() {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("path");
     
     // BEGIN APT
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
     // Declare data
-    auto M = PatternTree::APT::source<double**>("M", 256, 256);
-    auto x = PatternTree::APT::source<double*>("x", 256);
-    auto res = PatternTree::APT::source<double*>("res", 256);
+    auto M = PatternTree::APT::data<double**>("M", 256, 256);
+    auto x = PatternTree::APT::data<double*>("x", 256);
+    auto res = PatternTree::APT::data<double*>("res", 256);
 
     // MXV as map pattern
     std::unique_ptr<MXVFunctor> functor(new MXVFunctor(M, x));    
@@ -168,15 +168,15 @@ private:
 int main() {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("path");
     
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
     int K = 50;
     int N = 8192;
 
-    auto A = PatternTree::APT::source<double**>("A", N, N);
-    auto b = PatternTree::APT::source<double*>("b", N);
-    auto x = PatternTree::APT::source<double*>("x", N);
-    auto x_ = PatternTree::APT::source<double*>("x_", N);
+    auto A = PatternTree::APT::data<double**>("A", N, N);
+    auto b = PatternTree::APT::data<double*>("b", N);
+    auto x = PatternTree::APT::data<double*>("x", N);
+    auto x_ = PatternTree::APT::data<double*>("x_", N);
 
     for (int k = 0; k < K; k++)
     {

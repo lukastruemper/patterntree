@@ -1,15 +1,13 @@
 #pragma once
 
 #include <apt/apt.h>
-#include <data/data.h>
-#include <data/view.h>
 
-TEST(TestSuiteView, TestViewOneDim)
+TEST(TestSuiteView, TestOneDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double*>("field", 96);
+	auto view = PatternTree::APT::data<double*>("field", 96);
     auto data = view->data().lock();
 
     ASSERT_EQ(data->shape().size(), 1);
@@ -29,12 +27,12 @@ TEST(TestSuiteView, TestViewOneDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewTwoDim)
+TEST(TestSuiteView, TestTwoDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double**>("field", 66, 77);
+	auto view = PatternTree::APT::data<double**>("field", 66, 77);
     auto data = view->data().lock();
 
     ASSERT_EQ(data->shape().size(), 2);
@@ -56,12 +54,14 @@ TEST(TestSuiteView, TestViewTwoDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewElementOneDim)
+/***** VIEW: SUBIVEWS *****/
+
+TEST(TestSuiteSubviews, TestElementOneDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double*>("field", 64);
+	auto view = PatternTree::APT::data<double*>("field", 64);
     auto data = view->data().lock();
     auto element = PatternTree::View<double*>::element(data, 1);
 
@@ -76,12 +76,12 @@ TEST(TestSuiteView, TestViewElementOneDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewElementTwoDim)
+TEST(TestSuiteSubviews, TestElementTwoDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double**>("field", 121, 33);
+	auto view = PatternTree::APT::data<double**>("field", 121, 33);
     auto data = view->data().lock();
     auto element = PatternTree::View<double**>::element(data, 56);
 
@@ -98,12 +98,12 @@ TEST(TestSuiteView, TestViewElementTwoDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewSliceOneDim)
+TEST(TestSuiteSubviews, TestSliceOneDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double*>("field", 96);
+	auto view = PatternTree::APT::data<double*>("field", 96);
     auto data = view->data().lock();
     auto slice = PatternTree::View<double*>::slice(data, std::make_pair(0, 33));
 
@@ -119,12 +119,12 @@ TEST(TestSuiteView, TestViewSliceOneDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewSliceTwoDim)
+TEST(TestSuiteSubviews, TestSliceTwoDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double**>("field", 96, 35);
+	auto view = PatternTree::APT::data<double**>("field", 96, 35);
     auto data = view->data().lock();
     auto slice = PatternTree::View<double**>::slice(data, std::make_pair(0, 33), std::make_pair(0, 32));
 
@@ -141,12 +141,12 @@ TEST(TestSuiteView, TestViewSliceTwoDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewJoinOneDim)
+TEST(TestSuiteSubviews, TestJoinOneDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double*>("field", 121);
+	auto view = PatternTree::APT::data<double*>("field", 121);
     auto data = view->data().lock();
     
     auto subviewA = PatternTree::View<double*>::slice(data, std::make_pair(1, 2));
@@ -160,12 +160,12 @@ TEST(TestSuiteView, TestViewJoinOneDim)
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }
 
-TEST(TestSuiteView, TestViewJoinTwoDim)
+TEST(TestSuiteSubviews, TestJoinTwoDimensional)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32);
+    PatternTree::APT::init(cluster, 2, 32);
 
-	auto view = PatternTree::APT::source<double**>("field", 121, 33);
+	auto view = PatternTree::APT::data<double**>("field", 121, 33);
     auto data = view->data().lock();
     
     auto subviewA = PatternTree::View<double**>::slice(data, std::make_pair(1, 2), std::make_pair(0, 12));
@@ -176,6 +176,118 @@ TEST(TestSuiteView, TestViewJoinTwoDim)
     ASSERT_EQ(joined->shape().size(), 2);
     ASSERT_EQ(joined->shape()[0], 120);
     ASSERT_EQ(joined->shape()[1], 24);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
+}
+
+/***** VIEW: Disjointness *****/
+
+TEST(TestSuiteDisjointViews, TestSameData)
+{
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster, 2, 32);
+
+	auto viewA = PatternTree::APT::data<double*>("data", 10);
+    auto viewB = PatternTree::View<double*>::full(viewA->data());
+
+    ASSERT_FALSE(viewA->disjoint(*viewA));
+    
+    ASSERT_FALSE(viewA->disjoint(*viewB));
+    ASSERT_FALSE(viewB->disjoint(*viewA));
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
+}
+
+TEST(TestSuiteDisjointViews, TestDifferentData)
+{
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster, 2, 32);
+
+	auto viewA = PatternTree::APT::data<double*>("data", 10);
+    auto viewC = PatternTree::APT::data<double*>("data", 10);
+
+    ASSERT_TRUE(viewC->disjoint(*viewA));
+    ASSERT_TRUE(viewA->disjoint(*viewC));
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
+}
+
+TEST(TestSuiteDisjointViews, TestDifferentTypes)
+{
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster, 2, 32);
+
+	auto viewA = PatternTree::APT::data<double*>("data", 10);
+    auto viewC = PatternTree::APT::data<int*>("data", 10);
+
+    ASSERT_TRUE(viewC->disjoint(*viewA));
+    ASSERT_TRUE(viewA->disjoint(*viewC));
+
+    ASSERT_TRUE(std::static_pointer_cast<PatternTree::IView>(viewA)->disjoint(*std::static_pointer_cast<PatternTree::IView>(viewC)));
+    ASSERT_TRUE(viewA->disjoint(*std::static_pointer_cast<PatternTree::IView>(viewC)));
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
+}
+
+TEST(TestSuiteDisjointViews, TestElements)
+{
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster, 2, 32);
+    
+	auto view = PatternTree::APT::data<double*>("data", 35);
+    auto viewA = PatternTree::View<double*>::element(view->data(), 2);
+    auto viewB = PatternTree::View<double*>::element(view->data(), 2);
+    auto viewC = PatternTree::View<double*>::element(view->data(), 33);
+    auto viewD = PatternTree::View<double*>::element(view->data(), 34);
+
+    ASSERT_FALSE(viewA->disjoint(*viewA));
+    
+    ASSERT_FALSE(viewA->disjoint(*viewB));
+    ASSERT_FALSE(viewB->disjoint(*viewA));
+    
+    ASSERT_TRUE(viewA->disjoint(*viewC));
+    ASSERT_TRUE(viewC->disjoint(*viewA));
+    ASSERT_TRUE(viewB->disjoint(*viewC));
+    ASSERT_TRUE(viewC->disjoint(*viewB));
+
+    ASSERT_FALSE(viewD->disjoint(*viewC));
+    ASSERT_FALSE(viewC->disjoint(*viewD));
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
+}
+
+TEST(TestSuiteDisjointViews, TestArbitrarySlices)
+{
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
+
+	auto view = PatternTree::APT::data<double*>("data", 127);
+    auto viewA = PatternTree::View<double*>::slice(
+        view->data(),
+        std::make_pair(1,65)
+    );
+    auto viewB = PatternTree::View<double*>::slice(
+        view->data(),
+        std::make_pair(66,92)
+    );
+    auto viewC = PatternTree::View<double*>::slice(
+        view->data(),
+        std::make_pair(0,3)
+    );
+
+    ASSERT_FALSE(viewA->disjoint(*viewA));
+    ASSERT_FALSE(viewA->disjoint(*viewB));
+    ASSERT_FALSE(viewB->disjoint(*viewA));
+    ASSERT_FALSE(viewA->disjoint(*viewC));
+    ASSERT_FALSE(viewC->disjoint(*viewA));
+    ASSERT_TRUE(viewB->disjoint(*viewC));
+    ASSERT_TRUE(viewC->disjoint(*viewB));
+
+	auto viewNew = PatternTree::APT::data<double*>("data", 127);
+    auto viewD = PatternTree::View<double*>::slice(viewNew->data(), std::make_pair(1,8));
+
+    ASSERT_TRUE(viewD->disjoint(*viewA));
+    ASSERT_TRUE(viewA->disjoint(*viewD));
 
     std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 }

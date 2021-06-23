@@ -50,6 +50,12 @@ src/data/data.h
 src/data/data.cpp
 src/data/view.h
 src/data/view.cpp
+src/data/value.h
+src/data/value.cpp
+src/data/backend/symbolic_value.h
+src/data/backend/symbolic_value.cpp
+src/data/backend/kokkos_value.h
+src/data/backend/kokkos_value.cpp
 
 src/patterns/pattern.h
 src/patterns/pattern.cpp

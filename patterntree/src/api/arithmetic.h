@@ -34,7 +34,7 @@ namespace Arithmetic
 				view->add_FLOPS(flops);
 			}
 			else {
-				std::vector<int> shape = view->shape();
+				std::vector<size_t> shape = view->shape();
 				int inner_dim = std::accumulate(std::begin(shape) + 1, std::end(shape), 1, std::multiplies<int>());
 				
 				std::unordered_map<int, int> flops = {

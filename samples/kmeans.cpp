@@ -102,11 +102,11 @@ int main() {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");
     
 	// BEGIN APT
-	PatternTree::APT::initialize(cluster);
+	PatternTree::APT::init(cluster);
 
-    auto points = PatternTree::APT::source<double**>("points", N, 2);
-    auto centroids = PatternTree::APT::source<double**>("centroids", K, 2);
-    auto assignment = PatternTree::APT::source<int*>("assignment", N);
+    auto points = PatternTree::APT::data<double**>("points", N, 2);
+    auto centroids = PatternTree::APT::data<double**>("centroids", K, 2);
+    auto assignment = PatternTree::APT::data<int*>("assignment", N);
 
     for (size_t i = 0; i < niters; i++) {
         std::unique_ptr<KMeansAssignFunctor> assign_functor(new KMeansAssignFunctor(points, centroids));    

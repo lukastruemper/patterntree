@@ -56,15 +56,15 @@ int main() {
 	std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");
     
 	// BEGIN APT
-	PatternTree::APT::initialize(cluster);
+	PatternTree::APT::init(cluster);
 
     int K = 50;
     int N = 8192;
 
-    auto A = PatternTree::APT::source<double**>("A", N, N);
-    auto b = PatternTree::APT::source<double*>("b", N);
-    auto x = PatternTree::APT::source<double*>("x", N);
-    auto x_ = PatternTree::APT::source<double*>("x_", N);
+    auto A = PatternTree::APT::data<double**>("A", N, N);
+    auto b = PatternTree::APT::data<double*>("b", N);
+    auto x = PatternTree::APT::data<double*>("x", N);
+    auto x_ = PatternTree::APT::data<double*>("x_", N);
 
     for (int k = 0; k < K; k++)
     {

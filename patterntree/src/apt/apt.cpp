@@ -8,20 +8,20 @@ using json = nlohmann::json;
 
 PatternTree::APT* PatternTree::APT::instance = 0;
 
-size_t PatternTree::APT::size()
+size_t PatternTree::APT::size() const
 {
 	return this->flow_.size();
-};
+}
 
-const PatternTree::Cluster& PatternTree::APT::cluster()
+const PatternTree::Cluster& PatternTree::APT::cluster() const
 {
 	return *(this->cluster_);
-};
+}
 
-const std::vector<std::shared_ptr<PatternTree::IData>>& PatternTree::APT::sources()
+std::vector<std::shared_ptr<PatternTree::IData>> PatternTree::APT::data() const
 {
-	return this->sources_;
-};
+	return this->data_;
+}
 
 void PatternTree::APT::optimize(PatternTree::IOptimizer& optimizer)
 {
@@ -66,25 +66,17 @@ nlohmann::json PatternTree::APT::to_json()
 	return report;
 }
 
-void PatternTree::APT::summary()
+void PatternTree::APT::init(std::shared_ptr<PatternTree::Cluster> cluster)
 {
-	std::cout << "APT( ";
-	std::cout << "sources: " << this->sources_.size() << " ,";
-	std::cout << "steps: " << this->flow_.size() << " )" << std::endl;
-	std::cout << std::endl;
+	PatternTree::APT::init(cluster, 2, 32, true);
 };
 
-void PatternTree::APT::initialize(std::shared_ptr<PatternTree::Cluster> cluster)
+void PatternTree::APT::init(std::shared_ptr<PatternTree::Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency)
 {
-	PatternTree::APT::initialize(cluster, 2, 32, true);
+	PatternTree::APT::init(cluster, operation_interpolation_frequency, data_interpolation_frequency, true);
 };
 
-void PatternTree::APT::initialize(std::shared_ptr<PatternTree::Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency)
-{
-	PatternTree::APT::initialize(cluster, operation_interpolation_frequency, data_interpolation_frequency, true);
-};
-
-void PatternTree::APT::initialize(std::shared_ptr<PatternTree::Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency, bool synchronization_efficiency)
+void PatternTree::APT::init(std::shared_ptr<PatternTree::Cluster> cluster, size_t operation_interpolation_frequency, size_t data_interpolation_frequency, bool synchronization_efficiency)
 {
 	PatternTree::APT::instance = new PatternTree::APT(cluster, operation_interpolation_frequency, data_interpolation_frequency, synchronization_efficiency);
 };
@@ -111,6 +103,12 @@ void PatternTree::APT::data_interpolation_frequency(size_t frequency)
 
 std::unique_ptr<PatternTree::APT> PatternTree::APT::compile()
 {
+	Kokkos::initialize();
+
+	for (auto data : instance->data_) {
+		data->compile();
+	}
+
 	std::unique_ptr<PatternTree::APT> apt(PatternTree::APT::instance);
 	PatternTree::APT::instance = 0;
 

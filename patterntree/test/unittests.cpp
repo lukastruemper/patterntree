@@ -2,10 +2,12 @@
 
 #include "unittests/cluster/cluster_test.cpp"
 
-#include "unittests/data/data_test.cpp"
 #include "unittests/apt/apt_test.cpp"
+
+#include "unittests/data/data_test.cpp"
 #include "unittests/data/view_test.cpp"
-#include "unittests/data/disjoint_test.cpp"
+#include "unittests/data/value_test.cpp"
+
 
 #include "unittests/patterns/map_test.cpp"
 #include "unittests/patterns/pattern_split_test.cpp"

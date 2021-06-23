@@ -11,10 +11,10 @@
 TEST(TestSuiteHappensBefore, TestIndependent)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto viewA = PatternTree::APT::source<double*>("fieldA", 512);
-    auto viewC = PatternTree::APT::source<double*>("fieldB", 256);
+	auto viewA = PatternTree::APT::data<double*>("fieldA", 512);
+    auto viewC = PatternTree::APT::data<double*>("fieldB", 256);
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functorA), viewA);
@@ -32,9 +32,9 @@ TEST(TestSuiteHappensBefore, TestIndependent)
 TEST(TestSuiteHappensBefore, TestReadAfterWrite)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto viewA = PatternTree::APT::source<double*>("fieldA", 512);
+	auto viewA = PatternTree::APT::data<double*>("fieldA", 512);
 	auto viewB = PatternTree::View<double*>::slice(viewA->data(), std::make_pair(64, 66));
 
     std::unique_ptr<DummyMapFunctor> functorA(new DummyMapFunctor());
@@ -53,11 +53,11 @@ TEST(TestSuiteHappensBefore, TestReadAfterWrite)
 TEST(TestSuiteHappensBefore, TestReadAfterRead)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-	auto viewA = PatternTree::APT::source<double*>("fieldA", 512);
-	auto viewB = PatternTree::APT::source<double*>("fieldB", 512);
-    auto viewC = PatternTree::APT::source<double*>("fieldC", 512);
+	auto viewA = PatternTree::APT::data<double*>("fieldA", 512);
+	auto viewB = PatternTree::APT::data<double*>("fieldB", 512);
+    auto viewC = PatternTree::APT::data<double*>("fieldC", 512);
 
     std::unique_ptr<TwoViewsMapFunctor> functorA(new TwoViewsMapFunctor(viewC));
     PatternTree::APT::map<double*, TwoViewsMapFunctor>(std::move(functorA), viewA);

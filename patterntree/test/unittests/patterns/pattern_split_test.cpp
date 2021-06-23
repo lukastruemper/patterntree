@@ -1,5 +1,7 @@
 #pragma once
 
+#include "apt/apt.h"
+
 #include "data/data.h"
 #include "data/view.h"
 #include "patterns/map.h"
@@ -9,10 +11,10 @@
 
 TEST(TestSuitePatternSplit, TestConstructDefault)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
-    std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
+	auto view = PatternTree::APT::data<double*>("field", 1000);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     auto map = PatternTree::Map<double*>::create<DummyMapFunctor>("dummy", std::move(functor), view, 1);
@@ -26,17 +28,17 @@ TEST(TestSuitePatternSplit, TestConstructDefault)
     ASSERT_EQ(split.consumes().size(), 1);
     ASSERT_EQ(split.consumes()[0], view);
     ASSERT_EQ(split.produces()[0], view);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };
 
 TEST(TestSuitePatternSplit, TestConstructMultipleViewsDefault)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double*>> dataA(new PatternTree::Data<double*>("field", 1000));
-    std::shared_ptr<PatternTree::View<double*>> viewA = PatternTree::View<double*>::full(dataA);
-
-    std::shared_ptr<PatternTree::Data<double*>> dataB(new PatternTree::Data<double*>("field", 1000));
-    std::shared_ptr<PatternTree::View<double*>> viewB = PatternTree::View<double*>::full(dataB);
+	auto viewA = PatternTree::APT::data<double*>("field", 1000);
+	auto viewB = PatternTree::APT::data<double*>("field", 1000);
 
     std::unique_ptr<TwoViewsMapFunctor> functor(new TwoViewsMapFunctor(viewB));
     auto map = PatternTree::Map<double*>::create<TwoViewsMapFunctor>("dummy", std::move(functor), viewA, 1);
@@ -51,4 +53,6 @@ TEST(TestSuitePatternSplit, TestConstructMultipleViewsDefault)
     ASSERT_EQ(split.consumes()[0], viewA);
     ASSERT_EQ(split.consumes()[1], viewB);
     ASSERT_EQ(split.produces()[0], viewA);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };

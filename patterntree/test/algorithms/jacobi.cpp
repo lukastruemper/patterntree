@@ -55,20 +55,20 @@ private:
 std::unique_ptr<PatternTree::APT> jacobi(size_t N, size_t K, bool fuse)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 2, true);
+    PatternTree::APT::init(cluster, 2, 2, true);
 
-    auto A = PatternTree::APT::source<double**>("A", N, N);
+    auto A = PatternTree::APT::data<double**>("A", N, N);
     auto A_upper = PatternTree::View<double**>::slice(A->data(), std::make_pair(0, N / 2), std::make_pair(0, N));
     auto A_lower = PatternTree::View<double**>::slice(A->data(), std::make_pair(N / 2, N), std::make_pair(0, N));
 
     // Jacobi 1
 
-    auto b = PatternTree::APT::source<double*>("b", N);
+    auto b = PatternTree::APT::data<double*>("b", N);
     auto b_upper = PatternTree::View<double*>::slice(b->data(),  std::make_pair(0, N / 2));
     auto b_lower = PatternTree::View<double*>::slice(b->data(), std::make_pair(N / 2, N));
 
-    auto x = PatternTree::APT::source<double*>("x", N);
-    auto x_ = PatternTree::APT::source<double*>("x_", N);
+    auto x = PatternTree::APT::data<double*>("x", N);
+    auto x_ = PatternTree::APT::data<double*>("x_", N);
 
     for (int k = 0; k < K; k++)
     {
@@ -86,12 +86,12 @@ std::unique_ptr<PatternTree::APT> jacobi(size_t N, size_t K, bool fuse)
 
     // Jacobi 2
 
-    auto b2 = PatternTree::APT::source<double*>("b2", N);
+    auto b2 = PatternTree::APT::data<double*>("b2", N);
     auto b_upper2 = PatternTree::View<double*>::slice(b2->data(),  std::make_pair(0, N / 2));
     auto b_lower2 = PatternTree::View<double*>::slice(b2->data(), std::make_pair(N / 2, N));
 
-    auto x2 = PatternTree::APT::source<double*>("x2", N);
-    auto x_2 = PatternTree::APT::source<double*>("x_2", N);
+    auto x2 = PatternTree::APT::data<double*>("x2", N);
+    auto x_2 = PatternTree::APT::data<double*>("x_2", N);
 
     for (int k = 0; k < K; k++)
     {

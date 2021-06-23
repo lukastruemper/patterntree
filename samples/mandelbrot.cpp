@@ -73,9 +73,9 @@ int main() {
 
 	std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
     
-    PatternTree::APT::initialize(cluster);
+    PatternTree::APT::init(cluster);
 
-    auto set = PatternTree::APT::source<double*>("set", N * N);
+    auto set = PatternTree::APT::data<double*>("set", N * N);
 
     std::unique_ptr<MandelbrotFunctor> functor(new MandelbrotFunctor(N));    
     PatternTree::APT::map<double*, MandelbrotFunctor>(std::move(functor), set);

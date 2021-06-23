@@ -1,8 +1,7 @@
 #pragma once
 
-#include <Kokkos_Core.hpp>
+#include <apt/apt.h>
 
-#include <data/data.h>
 #include <data/view.h>
 #include <patterns/map.h>
 #include <api/arithmetic.h>
@@ -11,10 +10,10 @@
 
 TEST(TestSuiteMapDataflow, TestSimple)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
-    std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
+	auto view = PatternTree::APT::data<double*>("field", 1000);
 
     std::unique_ptr<DummyMapFunctor> functor(new DummyMapFunctor());
     auto map = PatternTree::Map<double*>::create<DummyMapFunctor>("dummy", std::move(functor), view, 1);
@@ -23,18 +22,18 @@ TEST(TestSuiteMapDataflow, TestSimple)
     ASSERT_EQ(map->consumes().at(0), view);
 
     ASSERT_EQ(map->produces().size(), 1);
-    ASSERT_EQ(map->produces().at(0), view);  
+    ASSERT_EQ(map->produces().at(0), view);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile(); 
 };
 
 TEST(TestSuiteMapDataflow, TestAdditionalView)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double*>> fieldA(new PatternTree::Data<double*>("fieldA", 1000));
-    std::shared_ptr<PatternTree::Data<double*>> fieldB(new PatternTree::Data<double*>("fieldB", 1000));
-
-    std::shared_ptr<PatternTree::View<double*>> viewA = PatternTree::View<double*>::full(fieldA);
-    std::shared_ptr<PatternTree::View<double*>> viewB = PatternTree::View<double*>::full(fieldB);
+	auto viewA = PatternTree::APT::data<double*>("field", 1000);
+	auto viewB = PatternTree::APT::data<double*>("field", 1000);
 
     std::unique_ptr<TwoViewsMapFunctor> functor(new TwoViewsMapFunctor(viewB));
     auto map = PatternTree::Map<double*>::create<TwoViewsMapFunctor>("dummy", std::move(functor), viewA, 1);
@@ -45,56 +44,64 @@ TEST(TestSuiteMapDataflow, TestAdditionalView)
 
     ASSERT_EQ(map->produces().size(), 1);
     ASSERT_EQ(map->produces().at(0), viewA);  
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };
 
 TEST(TestSuiteMapFLOPS, TestEmpty)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
-    std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
+	auto view = PatternTree::APT::data<double*>("field", 1000);
 
     std::unique_ptr<TemplateMapFunctor<double*>> functor(new TemplateMapFunctor<double*>());
     auto map = PatternTree::Map<double*>::create<TemplateMapFunctor<double*>>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 0);
-    ASSERT_EQ(map->flops(999, false), 0); 
+    ASSERT_EQ(map->flops(999, false), 0);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };
 
 TEST(TestSuiteMapFLOPS, TestConstant)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double*>> data(new PatternTree::Data<double*>("field", 1000));
-    std::shared_ptr<PatternTree::View<double*>> view = PatternTree::View<double*>::full(data);
+	auto view = PatternTree::APT::data<double*>("field", 1000);
 
     std::unique_ptr<ConstantCostsMapFunctor> functor(new ConstantCostsMapFunctor());
     auto map = PatternTree::Map<double*>::create<ConstantCostsMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 1);
     ASSERT_EQ(map->flops(999, false), 1); 
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };
 
 TEST(TestSuiteMapFLOPS, TestTriangle)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("field", 100, 2));
-    std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
+	auto view = PatternTree::APT::data<double**>("field", 100, 2);
 
     std::unique_ptr<TriangleCostsMapFunctor> functor(new TriangleCostsMapFunctor());
     auto map = PatternTree::Map<double**>::create<TriangleCostsMapFunctor>("dummy", std::move(functor), view, 1);
 
     ASSERT_EQ(map->flops(0, false), 2);
     ASSERT_EQ(map->flops(99, false), 200);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };
 
 TEST(TestSuiteMapFLOPS, TestTouch)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("field", 100, 2));
-    std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
+	auto view = PatternTree::APT::data<double**>("field", 100, 2);
 
     std::unique_ptr<CustomTriangleCostsMapFunctor> functor(new CustomTriangleCostsMapFunctor());
     auto map = PatternTree::Map<double**>::create<CustomTriangleCostsMapFunctor>("dummy", std::move(functor), view, 1);
@@ -102,14 +109,16 @@ TEST(TestSuiteMapFLOPS, TestTouch)
     ASSERT_EQ(map->flops(0, false), 3);
     ASSERT_EQ(map->flops(9, true), 21);
     ASSERT_EQ(map->flops(99, false), 201);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };
 
 TEST(TestSuiteMapFLOPS, TestInterpolate)
 {
-	
+    std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
+    PatternTree::APT::init(cluster);
 
-	std::shared_ptr<PatternTree::Data<double**>> data(new PatternTree::Data<double**>("field", 100, 2));
-    std::shared_ptr<PatternTree::View<double**>> view = PatternTree::View<double**>::full(data);
+	auto view = PatternTree::APT::data<double**>("field", 100, 2);
 
     std::unique_ptr<CustomTriangleCostsMapFunctor> functor(new CustomTriangleCostsMapFunctor());
     auto map = PatternTree::Map<double**>::create<CustomTriangleCostsMapFunctor>("dummy", std::move(functor), view, 1);
@@ -121,4 +130,6 @@ TEST(TestSuiteMapFLOPS, TestInterpolate)
     ASSERT_EQ(map->flops(97, false), 197);
     ASSERT_EQ(map->flops(98, false), 199);
     ASSERT_EQ(map->flops(99, false), 201);
+
+    std::unique_ptr<PatternTree::APT> apt = PatternTree::APT::compile();
 };

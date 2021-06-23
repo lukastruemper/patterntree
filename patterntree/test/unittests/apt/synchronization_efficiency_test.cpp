@@ -10,9 +10,9 @@
 TEST(TestSuiteSynchronizationEfficiency, TestDependence)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto data = PatternTree::APT::source<double*>("field", 2);
+	auto data = PatternTree::APT::data<double*>("field", 2);
 
     std::unique_ptr<DummyMapFunctor> functor1(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor1), data);
@@ -32,11 +32,11 @@ TEST(TestSuiteSynchronizationEfficiency, TestDependence)
 TEST(TestSuiteSynchronizationEfficiency, TestIndependence)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto data1 = PatternTree::APT::source<double*>("field", 2);
-	auto data2 = PatternTree::APT::source<double*>("field", 2);
-	auto data3 = PatternTree::APT::source<double*>("field", 2);
+	auto data1 = PatternTree::APT::data<double*>("field", 2);
+	auto data2 = PatternTree::APT::data<double*>("field", 2);
+	auto data3 = PatternTree::APT::data<double*>("field", 2);
 
     std::unique_ptr<DummyMapFunctor> functor1(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor1), data1);
@@ -58,11 +58,11 @@ TEST(TestSuiteSynchronizationEfficiency, TestIndependence)
 TEST(TestSuiteSynchronizationEfficiency, TestSharedView)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto data1 = PatternTree::APT::source<double*>("field", 2);
-    auto data2 = PatternTree::APT::source<double*>("field", 3);
-    auto data3 = PatternTree::APT::source<double*>("field", 3);
+	auto data1 = PatternTree::APT::data<double*>("field", 2);
+    auto data2 = PatternTree::APT::data<double*>("field", 3);
+    auto data3 = PatternTree::APT::data<double*>("field", 3);
 
     std::unique_ptr<TwoViewsMapFunctor> functor1(new TwoViewsMapFunctor(data3));
     PatternTree::APT::map<double*, TwoViewsMapFunctor>(std::move(functor1), data1);
@@ -86,10 +86,10 @@ TEST(TestSuiteSynchronizationEfficiency, TestSharedView)
 TEST(TestSuiteSynchronizationEfficiency, TestBubbleUp)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto data1 = PatternTree::APT::source<double*>("field", 2);
-    auto data2 = PatternTree::APT::source<double*>("field", 3);
+	auto data1 = PatternTree::APT::data<double*>("field", 2);
+    auto data2 = PatternTree::APT::data<double*>("field", 3);
 
     std::unique_ptr<DummyMapFunctor> functor1(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor1), data1);
@@ -119,11 +119,11 @@ TEST(TestSuiteSynchronizationEfficiency, TestBubbleUp)
 TEST(TestSuiteSynchronizationEfficiency, TestStopAndGo)
 {
     std::shared_ptr<PatternTree::Cluster> cluster = PatternTree::Cluster::parse("../clusters/cluster_c18g.json");    
-    PatternTree::APT::initialize(cluster, 2, 32, true);
+    PatternTree::APT::init(cluster, 2, 32, true);
 
-	auto data1 = PatternTree::APT::source<double*>("field", 2);
-    auto data2 = PatternTree::APT::source<double*>("field", 3);
-    auto data3 = PatternTree::APT::source<double*>("field", 3);
+	auto data1 = PatternTree::APT::data<double*>("field", 2);
+    auto data2 = PatternTree::APT::data<double*>("field", 3);
+    auto data3 = PatternTree::APT::data<double*>("field", 3);
 
     std::unique_ptr<DummyMapFunctor> functor1(new DummyMapFunctor());
     PatternTree::APT::map<double*, DummyMapFunctor>(std::move(functor1), data1);

@@ -2,30 +2,31 @@
 
 #include "data/view.h"
 
-PatternTree::IData::IData(std::string name, int dim0, int dim1)
-: name_(name), symbolic_(true)
-{
-	std::vector<int> shape;
-	shape.push_back(dim0);
-	if (dim1 > 0)
-	{
-		shape.push_back(dim1);
-	}
+PatternTree::IData::IData(std::unique_ptr<PatternTree::IValue> value)
+: value_(std::move(value)), basis_(), split_size_()
+{};
 
-	this->shape_ = shape;
-};
-
-std::string PatternTree::IData::name() const
+PatternTree::IValue& PatternTree::IData::value() const
 {
-	return this->name_;
-};
+	return *(this->value_);
+}
 
-std::vector<int> PatternTree::IData::shape() const
+std::string PatternTree::IData::identifier() const
 {
-	return this->shape_;
-};
+	return this->value_->identifier();
+}
 
-bool PatternTree::IData::is_symbolic() const
+std::vector<size_t> PatternTree::IData::shape() const
 {
-	return this->symbolic_;
-};
+	return this->value_->shape();
+}
+
+std::vector<std::shared_ptr<PatternTree::IView>> PatternTree::IData::basis() const
+{
+    return this->basis_;
+}
+
+std::vector<size_t> PatternTree::IData::split_size() const
+{
+	return this->split_size_;
+}

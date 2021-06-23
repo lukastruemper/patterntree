@@ -96,7 +96,7 @@ public:
 		std::unique_ptr<Map<D>> map(new Map<D>(identifier, std::move(functor), field, in_flow, out_flow));
 
 		// Gather info
-		std::vector<int> shape = field->shape();
+		std::vector<size_t> shape = field->shape();
 		size_t interpolation_width = std::max(shape[0] / interpolation_frequency, (size_t) 1);
 		for (size_t i = 0; i < shape[0]; i = i + interpolation_width)
 		{
